@@ -1,8 +1,15 @@
+export interface AuthUser {
+  userId: string;
+  email: string;
+  role: string;
+}
+
 export type ProjectCategory = "Architecture" | "Civil Engineering" | "Project Management" | "Masterplanning" | "Interior";
 export type ProjectStatus = "Completed" | "Ongoing";
 
 export interface Project {
-  id: string;
+  _id: string;
+  id?: string;
   slug: string;
   title: string;
   category: ProjectCategory;
@@ -17,13 +24,14 @@ export interface Project {
 export type BlogPostCategory = "Sustainability" | "Urbanization" | "Design Trends" | "Rwanda Projects" | "FEATURED INSIGHTS";
 
 export interface BlogPost {
-  id: string;
+  _id: string;
+  id?: string;
   slug: string;
   title: string;
   excerpt: string;
   content: string;
   category: BlogPostCategory;
-  readTime: string;
+  readTime: number;
   publishedAt: string;
   imageUrl: string;
   author: {
@@ -34,7 +42,8 @@ export interface BlogPost {
 }
 
 export interface TeamMember {
-  id: string;
+  _id: string;
+  id?: string;
   name: string;
   role: string;
   bio: string;
@@ -42,11 +51,13 @@ export interface TeamMember {
 }
 
 export interface Service {
-  id: string;
+  _id: string;
+  id?: string;
   title: string;
   shortDescription: string;
   fullDescription: string;
-  features: string[];
+  features: string[] | { name: string; meaning?: string; icon?: string }[];
   imageUrl: string;
-  icon: string; // name of lucide icon ideally
+  icon?: string;
+  buttonTitle?: string;
 }

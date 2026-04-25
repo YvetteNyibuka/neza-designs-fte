@@ -1,48 +1,81 @@
 import axios from "axios";
 
-// Creating a custom axios instance with defaults
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://api.neza-designs.local",
-  timeout: 10000,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api/v1",
+  timeout: 15000,
+  withCredentials: true, // send httpOnly refresh-token cookie automatically
+  headers: { "Content-Type": "application/json" },
 });
 
-// Request Interceptor
-api.interceptors.request.use(
-  (config) => {
-    // We could attach auth tokens here
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+// ── attach access token ──────────────────────────────────────────
+api.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = sessionStorage.getItem("accessToken");
+    if (token) config.headers.Authorization = `Bearer ${token}`;
   }
-);
+  return config;
+});
 
-// Response Interceptor
+// ── auto-refresh on 401 ──────────────────────────────────────────
+type QueueItem = { resolve: (t: string) => void; reject: (e: unknown) => void };
+let isRefreshing = false;
+let failedQueue: QueueItem[] = [];
+
+function processQueue(error: unknown, token: string | null = null) {
+  failedQueue.forEach((p) => (error ? p.reject(error) : p.resolve(token!)));
+  failedQueue = [];
+}
+
 api.interceptors.response.use(
-  (response) => {
-    // Any status code within 2xx triggers this function
-    return response;
-  },
-  (error) => {
-    // Any status codes outside 2xx trigger this function
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      if (error.response.status === 401) {
-        // Handle unauthorized access (e.g., redirect to login)
-        console.error("Unauthorized access, please login.");
+  (response) => response,
+  async (error) => {
+    const original = error.config;
+
+    // Refresh itself failed → kick to login
+    if (error.response?.status === 401 && original.url?.includes("/auth/refresh")) {
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("accessToken");
+        if (!window.location.pathname.startsWith("/admin/login")) {
+          window.location.href = "/admin/login";
+        }
       }
-    } else if (error.request) {
-      // The request was made but no response was received
-      console.error("Network error, please check your connection.");
+      return Promise.reject(error);
     }
+
+    if (error.response?.status === 401 && !original._retry) {
+      if (isRefreshing) {
+        return new Promise<string>((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then((token) => {
+          original.headers.Authorization = `Bearer ${token}`;
+          return api(original);
+        });
+      }
+
+      original._retry = true;
+      isRefreshing = true;
+
+      try {
+        const { data } = await api.post("/auth/refresh");
+        const newToken: string = data.data.accessToken;
+        if (typeof window !== "undefined") sessionStorage.setItem("accessToken", newToken);
+        processQueue(null, newToken);
+        original.headers.Authorization = `Bearer ${newToken}`;
+        return api(original);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("accessToken");
+          if (!window.location.pathname.startsWith("/admin/login")) {
+            window.location.href = "/admin/login";
+          }
+        }
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
     return Promise.reject(error);
   }
 );

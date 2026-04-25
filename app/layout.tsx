@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import { getServerBrandingSettings } from "@/lib/branding";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -12,18 +13,24 @@ const playfair = Playfair_Display({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "NEEZA Designs | African Architecture & Engineering",
-  description: "Crafting the Future of African Architecture. East Africa's premier architecture and engineering consultancy.",
-  icons: {
-    icon: "/logos/BprimaryLogo.png",
-    shortcut: "/logos/BprimaryLogo.png",
-    apple: "/logos/BprimaryLogo.png",
-  },
-};
-
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { BrandingProvider } from "@/components/layout/BrandingProvider";
+import { Toaster } from "sonner";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const branding = await getServerBrandingSettings();
+
+  return {
+    title: "NEEZA Designs | African Architecture & Engineering",
+    description: "Crafting the Future of African Architecture. East Africa's premier architecture and engineering consultancy.",
+    icons: {
+      icon: branding.favicon,
+      shortcut: branding.favicon,
+      apple: branding.favicon,
+    },
+  };
+}
 
 export default function RootLayout({
   children,
@@ -33,11 +40,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} h-full antialiased`}>
       <body suppressHydrationWarning className="min-h-full flex flex-col font-sans bg-neutral-50 text-neutral-900">
-        <Navbar />
-        <main className="flex-1 flex flex-col">
-          {children}
-        </main>
-        <Footer />
+        <BrandingProvider>
+          <Navbar />
+          <main className="flex-1 flex flex-col">
+            {children}
+          </main>
+          <Footer />
+          <Toaster richColors position="top-right" />
+        </BrandingProvider>
       </body>
     </html>
   );

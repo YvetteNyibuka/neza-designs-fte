@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { useBranding } from "@/components/layout/BrandingProvider";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -15,12 +16,14 @@ const navLinks = [
   { name: "Projects", href: "/projects" },
   { name: "Blog", href: "/blog" },
   { name: "About Us", href: "/about" },
+  { name: "Contact", href: "/contact" },
 ];
 
 export function Navbar() {
   const isScrolled = useScrolled(20);
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { branding } = useBranding();
 
   if (pathname?.startsWith("/admin")) return null;
 
@@ -44,7 +47,7 @@ export function Navbar() {
           {/* Logo placeholder - replace with actual SVG later */}
           <div className="flex flex-col">
            <Image 
-             src={isSolid ? "/logos/BprimaryLogo.png" : "/logos/WprimaryLogo.png"} 
+             src={isSolid ? branding.logoLight : branding.logoDark}
              alt="NEEZA Designs Logo" 
              width={100} 
              height={100} 
@@ -61,15 +64,15 @@ export function Navbar() {
               className={cn(
                 "text-sm font-medium transition-colors relative",
                 pathname === link.href
-                  ? (isSolid ? "text-primary" : "text-[#DAA119]")
-                  : (isSolid ? "text-neutral-700" : "text-white hover:text-[#DAA119]")
+                  ? (isSolid ? "text-primary" : "text-accent")
+                  : (isSolid ? "text-neutral-700" : "text-white hover:text-accent")
               )}
             >
               {link.name}
               {pathname === link.href && (
                 <span className={cn(
                   "absolute -bottom-1.5 left-0 w-full h-0.5 rounded-full transition-colors duration-300",
-                  isSolid ? "bg-primary" : "bg-[#DAA119]"
+                  isSolid ? "bg-primary" : "bg-accent"
                 )} />
               )}
             </Link>
@@ -77,15 +80,17 @@ export function Navbar() {
         </nav>
 
         <div className="hidden md:block">
-          <Button
-            variant={isSolid ? "default" : "outline"}
-            className={cn(
-              "rounded-md",
-              !isSolid && "text-white border-white hover:bg-white hover:text-neutral-900"
-            )}
-          >
-            Start a Project
-          </Button>
+          <Link href="/contact">
+            <Button
+              variant={isSolid ? "default" : "outline"}
+              className={cn(
+                "rounded-md",
+                !isSolid && "text-white border-white hover:bg-white hover:text-neutral-900"
+              )}
+            >
+              Start a Project
+            </Button>
+          </Link>
         </div>
 
         {/* Mobile menu button */}
@@ -119,7 +124,9 @@ export function Navbar() {
               {link.name}
             </Link>
           ))}
-          <Button className="w-full mt-4">Start a Project</Button>
+          <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
+            <Button className="w-full mt-4">Start a Project</Button>
+          </Link>
         </div>
       )}
     </header>

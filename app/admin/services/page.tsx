@@ -1,121 +1,295 @@
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
 import { AdminHeader } from "@/components/admin/Header";
-import { Edit, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
+import { Input } from "@/components/ui/Input";
+import { Edit, ArrowRight, Trash2, Plus } from "lucide-react";
 import Image from "next/image";
+import { getServices, createService, updateService, deleteService } from "@/lib/api/services";
+import { ImageUpload } from "@/components/ui/ImageUpload";
+import { toast } from "sonner";
+import { toastApiErrors, toastValidationErrors } from "@/lib/apiErrorToast";
+import { validateServiceForm } from "@/lib/formValidation";
+import type { Service } from "@/types";
+
+type FeatureForm = { name: string; meaning: string; icon: string };
+
+const emptyForm = {
+  title: "",
+  shortDescription: "",
+  fullDescription: "",
+  imageUrl: "",
+  buttonTitle: "",
+  features: [{ name: "", meaning: "", icon: "mdi:check-circle-outline" }] as FeatureForm[],
+};
 
 export default function AdminServicesPage() {
-  const services = [
-    {
-      id: 1,
-      dept: "DEPARTMENT A1",
-      title: "Architecture",
-      desc: "Innovative design and meticulous planning for high-end residential, commercial, and industrial structures focusing on sustainability and aesthetics.",
-      sub: ["Residential Design", "Commercial Spaces", "Industrial Planning"],
-      avatars: ["https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100", "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100"],
-      img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070"
-    },
-    {
-      id: 2,
-      dept: "DEPARTMENT B2",
-      title: "Civil Engineering",
-      desc: "Specialized infrastructure development, structural health analysis, and large-scale project execution for public and private sectors.",
-      sub: ["Roads & Transport", "Bridges", "Drainage Systems", "Structural Analysis"],
-      avatars: ["https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100"],
-      img: "https://images.unsplash.com/photo-1541888086425-d81bb19240f5?q=80&w=2070"
-    },
-    {
-      id: 3,
-      dept: "DEPARTMENT C3",
-      title: "Project Management",
-      desc: "End-to-end management of complex construction projects, ensuring timeline compliance, budget control, and quality assurance at every stage.",
-      sub: ["Construction Supervision", "Contract Administration"],
-      avatars: ["https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100", "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100"],
-      img: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=2070"
-    },
-    {
-      id: 4,
-      dept: "DEPARTMENT D4",
-      title: "Land Acquisition",
-      desc: "Strategic land identification, legal verification, valuation, and acquisition processes for diverse developmental projects across the region.",
-      sub: ["Site Selection", "Feasibility Studies", "Legal Processing"],
-      avatars: ["https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=100"],
-      img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2064"
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editing, setEditing] = useState<Service | null>(null);
+  const [form, setForm] = useState(emptyForm);
+  const [saving, setSaving] = useState(false);
+  const [deleteServiceId, setDeleteServiceId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const fetchServices = useCallback(async () => {
+    setLoading(true);
+    const res = await getServices().catch(() => null);
+    if (res) setServices(res.data ?? []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchServices(); }, [fetchServices]);
+
+  function openCreate() {
+    setEditing(null);
+    setForm(emptyForm);
+    setModalOpen(true);
+  }
+
+  function openEdit(svc: Service) {
+    const normalizedFeatures: FeatureForm[] = Array.isArray(svc.features)
+      ? svc.features.map((f) => {
+          if (typeof f === "string") {
+            return { name: f, meaning: f, icon: "mdi:check-circle-outline" };
+          }
+          return {
+            name: f.name ?? "",
+            meaning: f.meaning ?? "",
+            icon: f.icon ?? "mdi:check-circle-outline",
+          };
+        })
+      : [];
+
+    setEditing(svc);
+    setForm({
+      title: svc.title,
+      shortDescription: svc.shortDescription,
+      fullDescription: svc.fullDescription,
+      imageUrl: svc.imageUrl,
+      buttonTitle: svc.buttonTitle ?? "",
+      features: normalizedFeatures.length > 0 ? normalizedFeatures : emptyForm.features,
+    });
+    setModalOpen(true);
+  }
+
+  async function handleSave() {
+    const validationErrors = validateServiceForm(form);
+    if (validationErrors.length > 0) {
+      toastValidationErrors(validationErrors);
+      return;
     }
-  ];
+
+    setSaving(true);
+    try {
+      const payload = {
+        title: form.title.trim(),
+        shortDescription: form.shortDescription.trim(),
+        fullDescription: form.fullDescription.trim(),
+        imageUrl: form.imageUrl.trim() || undefined,
+        buttonTitle: form.buttonTitle.trim() || undefined,
+        features: form.features.map((feature) => ({
+          name: feature.name.trim(),
+          meaning: feature.meaning.trim(),
+          icon: feature.icon.trim(),
+        })),
+      };
+      if (editing) {
+        await updateService(editing._id, payload);
+      } else {
+        await createService(payload);
+      }
+      setModalOpen(false);
+      fetchServices();
+      toast.success(editing ? "Service updated" : "Service created");
+    } catch (err: unknown) {
+      toastApiErrors(err, "Failed to save service");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function openDeleteDialog(id: string) {
+    setDeleteServiceId(id);
+  }
+
+  async function confirmDelete() {
+    if (!deleteServiceId) return;
+    setDeleting(true);
+    await deleteService(deleteServiceId).then(() => {
+      toast.success("Service deleted");
+      setDeleteServiceId(null);
+    }).catch((err: unknown) => {
+      toastApiErrors(err, "Failed to delete service");
+    });
+    await fetchServices();
+    setDeleting(false);
+  }
+
+  function addFeature() {
+    setForm((f) => ({
+      ...f,
+      features: [...f.features, { name: "", meaning: "", icon: "mdi:check-circle-outline" }],
+    }));
+  }
+
+  function updateFeature(index: number, field: keyof FeatureForm, value: string) {
+    setForm((f) => ({
+      ...f,
+      features: f.features.map((feature, i) => (i === index ? { ...feature, [field]: value } : feature)),
+    }));
+  }
+
+  function removeFeature(index: number) {
+    setForm((f) => ({
+      ...f,
+      features: f.features.length === 1 ? f.features : f.features.filter((_, i) => i !== index),
+    }));
+  }
 
   return (
     <>
-      <AdminHeader title="Service Management" />
-      
-      <div className="p-8 max-w-[1400px]">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {services.map((svc) => (
-            <div key={svc.id} className="bg-white rounded-2xl border border-neutral-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
-              
-              {/* Header Image Area */}
-              <div className="relative h-64 w-full group">
-                <Image src={svc.img} alt={svc.title} fill style={{ objectFit: "cover" }} />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                
-                {/* Edit Button */}
-                <button className="absolute top-4 right-4 w-10 h-10 bg-black/20 hover:bg-black/40 backdrop-blur-md rounded-md flex items-center justify-center text-white transition-colors border border-white/20">
-                  <Edit className="w-5 h-5" />
-                </button>
+      <AdminHeader
+        title="Service Management"
+        actions={
+          <Button className="h-10" onClick={openCreate}>
+            <Plus className="w-4 h-4 mr-2" /> New Service
+          </Button>
+        }
+      />
 
-                {/* Badges & Title */}
-                <div className="absolute bottom-6 left-6 right-6">
-                  <div className="bg-[#1C1C1C]/40 backdrop-blur-md border border-white/20 text-[#B75E1A] text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded inline-block mb-3 bg-[#B75E1A]">
-                    <span className="text-white drop-shadow-md">{svc.dept}</span>
+      <div className="p-8 max-w-350">
+        {loading ? (
+          <div className="text-center text-neutral-400 py-16 text-sm">Loading…</div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {services.map((svc, idx) => (
+              <div key={svc._id} className="bg-white rounded-2xl border border-neutral-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+                <div className="relative h-64 w-full group">
+                  {svc.imageUrl ? (
+                    <Image src={svc.imageUrl} alt={svc.title} fill style={{ objectFit: "cover" }} unoptimized />
+                  ) : (
+                    <div className="w-full h-full bg-neutral-100" />
+                  )}
+                  <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute top-4 right-4 flex gap-2">
+                    <button onClick={() => openEdit(svc)} className="w-10 h-10 bg-black/20 hover:bg-black/40 backdrop-blur-md rounded-md flex items-center justify-center text-white transition-colors border border-white/20">
+                      <Edit className="w-5 h-5" />
+                    </button>
+                    <button onClick={() => openDeleteDialog(svc._id)} className="w-10 h-10 bg-black/20 hover:bg-red-500/60 backdrop-blur-md rounded-md flex items-center justify-center text-white transition-colors border border-white/20">
+                      <Trash2 className="w-5 h-5" />
+                    </button>
                   </div>
-                  <h3 className="font-heading text-3xl font-bold text-white drop-shadow-md line-clamp-1">{svc.title}</h3>
+                  <div className="absolute bottom-6 left-6 right-6">
+                    <div className="bg-[#1C1C1C]/40 backdrop-blur-md border border-white/20 text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded inline-block mb-3">
+                      <span className="text-white drop-shadow-md">DEPT {String.fromCharCode(65 + idx)}{idx + 1}</span>
+                    </div>
+                    <h3 className="font-heading text-3xl font-bold text-white drop-shadow-md line-clamp-1">{svc.title}</h3>
+                  </div>
                 </div>
-              </div>
-
-              {/* Content Body */}
-              <div className="p-8 flex-1 flex flex-col">
-                <p className="text-neutral-600 leading-relaxed mb-8 text-sm">
-                  {svc.desc}
-                </p>
-
-                <div className="mb-auto">
-                  <div className="flex justify-between items-center mb-4">
-                    <h4 className="text-xs font-bold tracking-widest text-[#B75E1A] uppercase flex items-center gap-2">
-                       <ArrowRight className="w-3 h-3 rotate-45 text-[#B75E1A]" /> SUB-SERVICES ({svc.sub.length})
+                <div className="p-8 flex-1 flex flex-col">
+                  <p className="text-neutral-600 leading-relaxed mb-8 text-sm">{svc.shortDescription}</p>
+                  <div className="mb-auto">
+                    <h4 className="text-xs font-bold tracking-widest text-primary uppercase flex items-center gap-2 mb-4">
+                      <ArrowRight className="w-3 h-3 rotate-45" /> FEATURES
                     </h4>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {svc.sub.map((s, i) => (
-                      <span key={i} className="px-3 py-1.5 bg-neutral-50 border border-neutral-200 rounded-full text-[11px] font-bold text-neutral-600">
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Footer */}
-                <div className="mt-10 pt-6 border-t border-neutral-100 flex items-center justify-between">
-                  <div className="flex items-center">
-                    {svc.avatars.map((av, i) => (
-                      <div key={i} className={`w-8 h-8 rounded-full border-2 border-white overflow-hidden relative ${i > 0 && '-ml-3'}`}>
-                        <Image src={av} alt="Avatar" fill style={{ objectFit: "cover" }} />
-                      </div>
-                    ))}
-                    <div className={`w-8 h-8 rounded-full border-2 border-white bg-[#F7EFEA] flex items-center justify-center text-[10px] font-bold text-[#B75E1A] -ml-3 z-10`}>
-                      +{Math.floor(Math.random() * 5) + 1}
+                    <div className="flex flex-wrap gap-2">
+                      {svc.features?.map((f, i) => (
+                        <span key={i} className="px-3 py-1.5 bg-neutral-50 border border-neutral-200 rounded-full text-[11px] font-bold text-neutral-600">
+                          {typeof f === "string" ? f : (f as { name: string }).name}
+                        </span>
+                      ))}
                     </div>
                   </div>
-                  
-                  <button className="text-sm font-bold text-[#B75E1A] flex items-center gap-2 hover:text-[#934509] transition-colors group">
-                    Edit Service Details <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <div className="mt-10 pt-6 border-t border-neutral-100 flex justify-end">
+                    <button onClick={() => openEdit(svc)} className="text-sm font-bold text-primary flex items-center gap-2 hover:text-primary-dark transition-colors group">
+                      Edit Service Details <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editing ? "Edit Service" : "New Service"}>
+        <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+          <Input label="Title" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: (e.target as HTMLInputElement).value }))} />
+          <ImageUpload label="Service Image" folder="services" value={form.imageUrl} onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))} />
+          <Input label="Button Title" value={form.buttonTitle} onChange={(e) => setForm((f) => ({ ...f, buttonTitle: (e.target as HTMLInputElement).value }))} />
+          <div>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">Short Description</label>
+            <textarea rows={2} className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary resize-none" value={form.shortDescription} onChange={(e) => setForm((f) => ({ ...f, shortDescription: e.target.value }))} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">Full Description</label>
+            <textarea rows={4} className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary resize-none" value={form.fullDescription} onChange={(e) => setForm((f) => ({ ...f, fullDescription: e.target.value }))} />
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium text-neutral-700">Features</label>
+              <button type="button" onClick={addFeature} className="text-xs font-semibold text-primary hover:underline">
+                + Add feature
+              </button>
+            </div>
+            {form.features.map((feature, index) => (
+              <div key={index} className="space-y-2 border border-neutral-200 rounded-lg p-3 bg-neutral-50/50">
+                <Input
+                  label={`Feature ${index + 1} Name`}
+                  value={feature.name}
+                  onChange={(e) => updateFeature(index, "name", (e.target as HTMLInputElement).value)}
+                />
+                <Input
+                  label="Meaning"
+                  value={feature.meaning}
+                  onChange={(e) => updateFeature(index, "meaning", (e.target as HTMLInputElement).value)}
+                />
+                <Input
+                  label="Icon (Iconify key)"
+                  value={feature.icon}
+                  onChange={(e) => updateFeature(index, "icon", (e.target as HTMLInputElement).value)}
+                />
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => removeFeature(index)}
+                    disabled={form.features.length === 1}
+                    className="text-xs text-red-500 disabled:text-neutral-300"
+                  >
+                    Remove
                   </button>
                 </div>
               </div>
-
-            </div>
-          ))}
+            ))}
+          </div>
+          <div className="flex gap-3 pt-2">
+            <Button variant="outline" className="flex-1" onClick={() => setModalOpen(false)}>Cancel</Button>
+            <Button className="flex-1" onClick={handleSave} disabled={saving}>{saving ? "Saving…" : "Save"}</Button>
+          </div>
         </div>
-      </div>
+      </Modal>
+
+      <Modal
+        isOpen={Boolean(deleteServiceId)}
+        onClose={() => !deleting && setDeleteServiceId(null)}
+        title="Delete Service"
+        description="This action cannot be undone."
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setDeleteServiceId(null)} disabled={deleting}>Cancel</Button>
+            <Button variant="destructive" onClick={confirmDelete} disabled={deleting}>
+              {deleting ? "Deleting..." : "Delete"}
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm text-neutral-600">Are you sure you want to delete this service?</p>
+      </Modal>
     </>
   );
 }
+

@@ -1,26 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { dummyPosts } from "@/lib/data";
+import { getPosts } from "@/lib/api/posts";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { cn, formatDate } from "@/lib/utils";
 import { Send, ArrowRight } from "lucide-react";
+import type { BlogPost } from "@/types";
 
 const categories = ["All", "Sustainability", "Urbanization", "Design Trends", "Rwanda Projects"];
 
 export default function BlogPage() {
   const [activeCat, setActiveCat] = useState("All");
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredPosts = dummyPosts.filter(
-    (post) => activeCat === "All" || post.category === activeCat
-  );
+  useEffect(() => {
+    setLoading(true);
+    const params: Record<string, string> = { limit: "50" };
+    if (activeCat !== "All") params.category = activeCat;
+    getPosts(params).then((res) => {
+      setPosts(res.data?.data ?? []);
+    }).catch(() => {}).finally(() => setLoading(false));
+  }, [activeCat]);
 
-  const featuredPost = dummyPosts[0]; // Just use first for demo
-  const gridPosts = filteredPosts.filter((post) => post.id !== featuredPost.id || activeCat !== "All");
+  const filteredPosts = posts;
+
+  const featuredPost = posts[0] ?? null;
+  const gridPosts = activeCat === "All" && featuredPost ? filteredPosts.slice(1) : filteredPosts;
 
   return (
     <div className="flex flex-col flex-1 w-full bg-neutral-50 pb-24">
@@ -74,7 +84,7 @@ export default function BlogPage() {
         {/* Featured Post (only show if 'All' is selected for now) */}
         {activeCat === "All" && featuredPost && ( 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-primary/5 rounded-2xl overflow-hidden border border-neutral-100 hover:border-primary/20 transition-colors transition-duration-300 mb-16 shadow-sm">
-            <div className="relative h-64 md:h-full min-h-[400px] w-full">
+            <div className="relative h-64 md:h-full min-h-100 w-full">
               <Image src={featuredPost.imageUrl} alt={featuredPost.title} fill style={{ objectFit: "cover" }} />
             </div>
             <div className="p-8 md:p-12">
@@ -91,7 +101,7 @@ export default function BlogPage() {
               
               <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-heading font-bold text-primary">
-                    {featuredPost.author.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                    {featuredPost.author.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
                   </div>
                   <div>
                     <div className="text-sm font-bold text-neutral-900">{featuredPost.author.name}</div>
@@ -108,14 +118,14 @@ export default function BlogPage() {
         {/* Grid Posts */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
           {gridPosts.map((post) => (
-            <div key={post.id} className="bg-white rounded-2xl border border-neutral-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow group flex flex-col h-full">
+            <div key={post._id} className="bg-white rounded-2xl border border-neutral-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow group flex flex-col h-full">
               <div className="relative h-56 w-full overflow-hidden">
                 <Image src={post.imageUrl} alt={post.title} fill style={{ objectFit: "cover" }} className="group-hover:scale-105 transition-transform duration-500" />
               </div>
               <div className="p-6 flex flex-col flex-1">
                 <div className="flex items-center justify-between mb-4">
                   <Badge variant="outline" className="text-xs rounded-md bg-primary/20 text-primary uppercase  py-1">{post.category}</Badge>
-                  <span className="text-xs text-neutral-400">{post.readTime}</span>
+                  <span className="text-xs text-neutral-400">{post.readTime} Minutes read</span>
                 </div>
                 <h3 className="font-heading text-xl font-bold text-neutral-900 mb-3 group-hover:text-primary transition-colors line-clamp-2">
                   <Link href={`/blog/${post.slug}`} className="before:absolute before:inset-0">
