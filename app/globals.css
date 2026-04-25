@@ -4,6 +4,7 @@
   --color-primary: #B75E1A;
   --color-primary-dark: #934509;
   --color-secondary: #1C1C1C;
+  --color-accent: #DAA119;
   --color-neutral-50: #FAFAF8;
   --color-neutral-100: #F4F1ED;
   --color-neutral-200: #E5E5E5;
@@ -16,8 +17,10 @@
   --color-warning: #d97706;
   --color-destructive: #dc2626;
 
-  --font-sans: var(--font-playfair), ui-sans-serif, system-ui, sans-serif;
-  --font-heading: var(--font-playfair), ui-serif, Georgia, serif;
+  --font-brand-sans: var(--font-playfair), ui-sans-serif, system-ui, sans-serif;
+  --font-brand-heading: var(--font-playfair), ui-serif, Georgia, serif;
+  --font-sans: var(--font-brand-sans);
+  --font-heading: var(--font-brand-heading);
 }
 
 @layer base {
@@ -35,5 +38,65 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading text-neutral-900;
   }
+}
+
+/* ─── Tiptap rich text editor prose styles ─── */
+.prose {
+  line-height: 1.75;
+  color: var(--color-neutral-900);
+}
+.prose h1 { font-size: 1.5rem; font-weight: 700; margin: 1rem 0 0.5rem; font-family: var(--font-heading); }
+.prose h2 { font-size: 1.25rem; font-weight: 700; margin: 0.875rem 0 0.4rem; font-family: var(--font-heading); }
+.prose h3 { font-size: 1.1rem; font-weight: 600; margin: 0.75rem 0 0.35rem; font-family: var(--font-heading); }
+.prose p { margin: 0.5rem 0; }
+.prose strong { font-weight: 700; }
+.prose em { font-style: italic; }
+.prose s { text-decoration: line-through; }
+.prose a { color: var(--color-primary); text-decoration: underline; text-underline-offset: 2px; }
+.prose a:hover { color: var(--color-primary-dark); }
+.prose ul { list-style: disc; padding-left: 1.4rem; margin: 0.5rem 0; }
+.prose ol { list-style: decimal; padding-left: 1.4rem; margin: 0.5rem 0; }
+.prose li { margin: 0.2rem 0; }
+.prose blockquote {
+  border-left: 3px solid var(--color-primary);
+  margin: 0.75rem 0;
+  padding: 0.35rem 0.875rem;
+  color: var(--color-neutral-700);
+  font-style: italic;
+  background: var(--color-neutral-100);
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+.prose code {
+  background: var(--color-neutral-100);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: 3px;
+  padding: 0.1em 0.35em;
+  font-size: 0.82em;
+  font-family: ui-monospace, 'Cascadia Code', Menlo, monospace;
+}
+.prose pre {
+  background: #1e1e2e;
+  color: #cdd6f4;
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  margin: 0.75rem 0;
+  font-size: 0.82rem;
+  font-family: ui-monospace, 'Cascadia Code', Menlo, monospace;
+}
+.prose pre code { background: transparent; border: none; padding: 0; font-size: inherit; color: inherit; }
+.prose hr {
+  border: none;
+  border-top: 2px solid var(--color-neutral-200);
+  margin: 1.25rem 0;
+}
+
+/* Placeholder */
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--color-neutral-500);
+  pointer-events: none;
+  height: 0;
 }
 

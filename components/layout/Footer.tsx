@@ -1,27 +1,31 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Mail, MapPin, Phone } from "lucide-react";
+import { useBranding } from "@/components/layout/BrandingProvider";
 
 export function Footer() {
   const pathname = usePathname();
+  const { branding } = useBranding();
   if (pathname?.startsWith("/admin")) return null;
 
   return (
-    <footer className="bg-[#150F0B] text-neutral-300 py-16">
+    <footer className="bg-(--color-secondary) text-neutral-300 py-16">
       <div className="container mx-auto px-4 md:px-8 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           
           {/* Brand Col */}
           <div className="space-y-6">
-            <div className="flex flex-col">
-              <span className="font-heading font-bold text-3xl tracking-tighter leading-none text-primary">
-                NEEZA
-              </span>
-              <span className="text-xs font-bold tracking-widest uppercase text-neutral-400 mt-1">
-                Designs Ltd.
-              </span>
+            <div className="flex items-center">
+              <Image
+                src={branding.logoDark}
+                alt="NEEZA Designs Logo"
+                width={120}
+                height={48}
+                className="h-auto w-auto max-h-12"
+              />
             </div>
             <p className="text-sm leading-relaxed max-w-xs text-neutral-400">
               East Africa's premier architecture and engineering consultancy. Designing the skyline of tomorrow, today.

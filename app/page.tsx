@@ -1,12 +1,22 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import { dummyProjects } from "@/lib/data";
+import { getProjects } from "@/lib/api/projects";
 import { MoveRight, ShieldCheck, Zap, Leaf, ChevronLeft, ChevronRight } from "lucide-react";
+import type { Project } from "@/types";
 
 export default function Home() {
-  const featuredProjects = dummyProjects.slice(0, 6);
+  const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    getProjects({ limit: 6 }).then((res) => {
+      setFeaturedProjects(res.data?.data ?? []);
+    }).catch(() => {});
+  }, []);
 
   return (
     <div className="flex flex-col flex-1 w-full relative">
@@ -161,7 +171,7 @@ export default function Home() {
                   className="transition-transform duration-100 group-hover:scale-110"
                 />
                 {/* Base gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/90 via-neutral-900/30 to-neutral-900/20 group-hover:from-neutral-900/95 group-hover:via-neutral-900/60 group-hover:to-neutral-900/40 transition-all duration-300" />
+                <div className="absolute inset-0 bg-linear-to-t from-neutral-900/90 via-neutral-900/30 to-neutral-900/20 group-hover:from-neutral-900/95 group-hover:via-neutral-900/60 group-hover:to-neutral-900/40 transition-all duration-300" />
 
                 {/* Default state: icon + title at bottom */}
                 <div className="absolute inset-0 flex flex-col justify-end p-8 transition-all duration-300 z-10">
@@ -206,9 +216,9 @@ export default function Home() {
           </div>
           <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
             {featuredProjects.map((project) => (
-              <div key={project.id} className="group relative rounded-2xl overflow-hidden h-[320px] min-w-[320px] md:min-w-[450px] flex-shrink-0 snap-start">
+              <div key={project._id} className="group relative rounded-2xl overflow-hidden h-80 min-w-[320px] md:min-w-112.5 shrink-0 snap-start">
                 <Image src={project.imageUrl} alt={project.title} fill style={{ objectFit: "cover" }} className="group-hover:scale-105 transition-transform duration-100" />
-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/90 via-neutral-900/20 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-neutral-900/90 via-neutral-900/20 to-transparent" />
                 <div className="absolute bottom-8 left-8 right-8">
                   <div className="text-[#DAA119] text-xs font-bold tracking-widest uppercase mb-2">
                     {project.category}

@@ -1,9 +1,19 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { dummyTeam } from "@/lib/data";
+import { getTeam } from "@/lib/api/team";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Compass, Network, Leaf, Users } from "lucide-react";
+import type { TeamMember } from "@/types";
 
 export default function AboutPage() {
+  const [team, setTeam] = useState<TeamMember[]>([]);
+
+  useEffect(() => {
+    getTeam().then((res) => setTeam(res.data ?? [])).catch(() => {});
+  }, []);
+
   return (
     <div className="flex flex-col flex-1 w-full bg-white">
       {/* 
@@ -152,9 +162,9 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {dummyTeam.map((member) => (
-              <div key={member.id} className="group cursor-pointer">
-                <div className="relative h-[400px] w-full rounded-2xl overflow-hidden mb-6 bg-neutral-100">
+            {team.map((member) => (
+              <div key={member._id} className="group cursor-pointer">
+                <div className="relative h-100 w-full rounded-2xl overflow-hidden mb-6 bg-neutral-100">
                   <Image 
                     src={member.imageUrl} 
                     alt={member.name} 
@@ -210,7 +220,7 @@ export default function AboutPage() {
                 </li>
               </ul>
             </div>
-            <div className="h-[400px] lg:h-auto min-h-[400px] w-full relative bg-neutral-200">
+            <div className="h-100 lg:h-auto min-h-100 w-full relative bg-neutral-200">
               {/* Using a static map image for demonstration based on the plan. In a real app, an iframe embed of Google Maps/OSM goes here. */}
               <iframe 
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15950.021074474775!2d30.126435!3d-1.951034!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zKcKwNTcnMDMuNyJTIDMwwrAwNyc1OC45IkU!5e0!3m2!1sen!2srw!4v1636203930811!5m2!1sen!2srw" 

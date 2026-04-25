@@ -28,7 +28,8 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement | HTMLSele
     },
     ref
   ) => {
-    const inputId = id || `input-${Math.random().toString(36).substring(7)}`;
+    const generatedId = React.useId();
+    const inputId = id || `input-${generatedId}`;
 
     // Common classes for text-like inputs
     const baseInputClasses = cn(
@@ -43,9 +44,9 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement | HTMLSele
         return (
           <textarea
             id={inputId}
-            className={cn(baseInputClasses, "min-h-[80px] py-3")}
+            className={cn(baseInputClasses, "min-h-20 py-3")}
             ref={ref as React.Ref<HTMLTextAreaElement>}
-            {...(registration as any)}
+            {...(registration ?? {})}
             {...(props as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
           />
         );
@@ -57,7 +58,7 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement | HTMLSele
             id={inputId}
             className={baseInputClasses}
             ref={ref as React.Ref<HTMLSelectElement>}
-            {...(registration as any)}
+            {...(registration ?? {})}
             {...(props as React.SelectHTMLAttributes<HTMLSelectElement>)}
           >
             {options.map((opt) => (

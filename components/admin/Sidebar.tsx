@@ -9,11 +9,10 @@ import {
   FileText, 
   Wrench, 
   Users, 
-  Image as ImageIcon, 
+  Mail,
   Settings, 
   LogOut 
 } from "lucide-react";
-import Image from "next/image";
 
 const sidebarLinks = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -21,6 +20,7 @@ const sidebarLinks = [
   { name: "Blog Posts", href: "/admin/blog", icon: FileText },
   { name: "Services", href: "/admin/services", icon: Wrench },
   { name: "Team", href: "/admin/team", icon: Users },
+  { name: "Inquiries", href: "/admin/inquiries", icon: Mail },
   // { name: "Media Library", href: "/admin/media", icon: ImageIcon },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];

@@ -2,7 +2,7 @@ import { Project, BlogPost, TeamMember, Service } from "@/types";
 
 export const dummyProjects: Project[] = [
   {
-    id: "1",
+    _id: "1",
     slug: "kigali-heights-complex",
     title: "Kigali Heights Complex",
     category: "Architecture",
@@ -13,7 +13,7 @@ export const dummyProjects: Project[] = [
     completionYear: 2022
   },
   {
-    id: "2",
+    _id: "2",
     slug: "urban-bridge-initiative",
     title: "Urban Bridge Initiative",
     category: "Civil Engineering",
@@ -23,7 +23,7 @@ export const dummyProjects: Project[] = [
     location: "Musanze, Rwanda",
   },
   {
-    id: "3",
+    _id: "3",
     slug: "pearl-residences",
     title: "Pearl Residences",
     category: "Interior",
@@ -34,7 +34,7 @@ export const dummyProjects: Project[] = [
     completionYear: 2023
   },
   {
-    id: "4",
+    _id: "4",
     slug: "eco-lodge-akagera",
     title: "Eco-Lodge Akagera",
     category: "Architecture",
@@ -45,7 +45,7 @@ export const dummyProjects: Project[] = [
     completionYear: 2021
   },
   {
-    id: "5",
+    _id: "5",
     slug: "horizon-office-tower",
     title: "Horizon Office Tower",
     category: "Architecture",
@@ -55,7 +55,7 @@ export const dummyProjects: Project[] = [
     location: "Kigali, Rwanda",
   },
   {
-    id: "6",
+    _id: "6",
     slug: "green-city-pilot",
     title: "Green City Pilot",
     category: "Masterplanning",
@@ -68,11 +68,11 @@ export const dummyProjects: Project[] = [
 
 export const dummyPosts: BlogPost[] = [
   {
-    id: "1",
+    _id: "1",
     slug: "future-of-vertical-forests",
     title: "The Future of Vertical Forests in Kigali: A Green Renaissance",
     category: "FEATURED INSIGHTS",
-    readTime: "7 min read",
+    readTime: 7,
     publishedAt: "2024-03-12T10:00:00Z",
     excerpt: "As urbanization accelerates across East Africa, Rwanda is setting a global benchmark for integrating lush, vertical biophilic elements into luxury residential high-rises.",
     content: "Full content here...",
@@ -83,11 +83,11 @@ export const dummyPosts: BlogPost[] = [
     }
   },
   {
-    id: "2",
+    _id: "2",
     slug: "net-zero-luxury",
     title: "The New Standard of Net-Zero Luxury",
     category: "Sustainability",
-    readTime: "4 min read",
+    readTime: 4,
     publishedAt: "2024-02-28T09:00:00Z",
     excerpt: "Can high-end architecture truly be carbon neutral? NEEZA explores the innovative techniques behind the Kigali Green Tech Villas.",
     content: "Full content here...",
@@ -98,11 +98,11 @@ export const dummyPosts: BlogPost[] = [
     }
   },
   {
-    id: "3",
+    _id: "3",
     slug: "smart-infrastructure",
     title: "Smart Infrastructure in Expanding Megacities",
     category: "Urbanization",
-    readTime: "6 min read",
+    readTime: 6,
     publishedAt: "2024-02-15T11:00:00Z",
     excerpt: "A deep dive into how Kigali and Nairobi are implementing IoT sensors to manage resource distribution and traffic flow.",
     content: "Full content here...",
@@ -113,11 +113,11 @@ export const dummyPosts: BlogPost[] = [
     }
   },
   {
-    id: "4",
+    _id: "4",
     slug: "sustainable-materials",
     title: "Sustainable Materials: Beyond the Aesthetic",
     category: "Design Trends",
-    readTime: "5 min read",
+    readTime: 5,
     publishedAt: "2024-01-20T08:30:00Z",
     excerpt: "Discover how reclaimed materials and bio-composites are redefining the luxury interior landscape in modern African estates.",
     content: "Full content here...",
@@ -131,21 +131,21 @@ export const dummyPosts: BlogPost[] = [
 
 export const dummyTeam: TeamMember[] = [
   {
-    id: "1",
+    _id: "1",
     name: "Yves Karangwa",
     role: "MD & Co-Founder",
     bio: "15 years of experience leading major commercial developments across East Africa.",
     imageUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1974&auto=format&fit=crop"
   },
   {
-    id: "2",
+    _id: "2",
     name: "Jean Karangwa",
     role: "MD & Co-Founder",
     bio: "12 years of experience leading major commercial developments across East Africa.",
     imageUrl: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1974&auto=format&fit=crop"
   },
   {
-    id: "3",
+    _id: "3",
     name: "Tony Karangwa",
     role: "MD & Co-Founder",
     bio: "10 years of experience leading major commercial developments across East Africa.",

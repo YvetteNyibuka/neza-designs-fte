@@ -3,10 +3,31 @@
 import { AdminHeader } from "@/components/admin/Header";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Modal } from "@/components/ui/Modal";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 import { Icon } from "@iconify/react";
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { useAuth } from "@/context/AuthContext";
+import {
+  changePassword,
+  deleteMyAccount,
+  getSecuritySettings,
+  getSessions,
+  revokeOtherSessions,
+  revokeSession,
+  updateSecuritySettings,
+  type AuthSession,
+} from "@/lib/api/auth";
+import { getSettings, updateSettings } from "@/lib/api/settings";
+import { toast } from "sonner";
+import { toastApiErrors, toastValidationErrors } from "@/lib/apiErrorToast";
+import {
+  validateBrandingSettingsForm,
+  validateChangePasswordForm,
+  validateSeoSettingsForm,
+} from "@/lib/formValidation";
 
 /* ─── tiny toggle ────────────────────────────────────────────── */
 function Toggle({
@@ -62,12 +83,24 @@ function SectionCard({
 
 /* ─── SECURITY TAB ───────────────────────────────────────────── */
 function SecurityTab() {
+  const { logout } = useAuth();
   const [twoFAEnabled, setTwoFAEnabled] = useState(false);
   const [loginAlerts, setLoginAlerts] = useState(true);
+  const [securityLoading, setSecurityLoading] = useState(true);
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [currentPwd, setCurrentPwd] = useState("");
   const [newPwd, setNewPwd] = useState("");
+  const [confirmPwd, setConfirmPwd] = useState("");
+  const [pwdMsg, setPwdMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [sessions, setSessions] = useState<AuthSession[]>([]);
+  const [loadingSessions, setLoadingSessions] = useState(true);
+  const [sessionBusyId, setSessionBusyId] = useState<string | null>(null);
+  const [revokingOthers, setRevokingOthers] = useState(false);
+  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   const strength = !newPwd
     ? 0
@@ -82,11 +115,108 @@ function SecurityTab() {
   const strengthLabel = ["", "Weak", "Fair", "Good", "Strong"][strength];
   const strengthColor = ["", "bg-red-400", "bg-orange-400", "bg-yellow-400", "bg-green-500"][strength];
 
-  const sessions = [
-    { device: "Chrome on Windows 11", location: "Kigali, Rwanda", time: "Active now", icon: "mdi:monitor", current: true },
-    { device: "Safari on iPhone 15", location: "Nairobi, Kenya", time: "2 hours ago", icon: "mdi:cellphone", current: false },
-    { device: "Firefox on macOS", location: "Kampala, Uganda", time: "Yesterday, 4:12 PM", icon: "mdi:laptop", current: false },
-  ];
+  function iconForSession(device: string) {
+    const d = device.toLowerCase();
+    if (d.includes("iphone") || d.includes("android")) return "mdi:cellphone";
+    if (d.includes("mac") || d.includes("laptop")) return "mdi:laptop";
+    return "mdi:monitor";
+  }
+
+  function formatSessionTime(value: string) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "Unknown";
+    return date.toLocaleString();
+  }
+
+  async function refreshSessions() {
+    setLoadingSessions(true);
+    try {
+      const res = await getSessions();
+      setSessions(res.data ?? []);
+    } catch (err: unknown) {
+      toastApiErrors(err, "Failed to fetch active sessions");
+    } finally {
+      setLoadingSessions(false);
+    }
+  }
+
+  useEffect(() => {
+    async function load() {
+      setSecurityLoading(true);
+      try {
+        const [settingsRes, sessionsRes] = await Promise.all([
+          getSecuritySettings(),
+          getSessions(),
+        ]);
+        const settings = settingsRes.data;
+        if (settings) {
+          setTwoFAEnabled(Boolean(settings.twoFAEnabled));
+          setLoginAlerts(Boolean(settings.loginAlerts));
+        }
+        setSessions(sessionsRes.data ?? []);
+      } catch (err: unknown) {
+        toastApiErrors(err, "Failed to load security settings");
+      } finally {
+        setSecurityLoading(false);
+        setLoadingSessions(false);
+      }
+    }
+    load();
+  }, []);
+
+  async function persistSecurity(next: { twoFAEnabled?: boolean; loginAlerts?: boolean }) {
+    try {
+      const res = await updateSecuritySettings(next);
+      if (typeof res.data?.twoFAEnabled === "boolean") setTwoFAEnabled(res.data.twoFAEnabled);
+      if (typeof res.data?.loginAlerts === "boolean") setLoginAlerts(res.data.loginAlerts);
+      toast.success("Security preferences updated");
+      return true;
+    } catch (err: unknown) {
+      toastApiErrors(err, "Failed to update security preferences");
+      return false;
+    }
+  }
+
+  async function handleRevokeSession(sessionId: string) {
+    setSessionBusyId(sessionId);
+    try {
+      await revokeSession(sessionId);
+      toast.success("Session revoked");
+      await refreshSessions();
+    } catch (err: unknown) {
+      toastApiErrors(err, "Failed to revoke session");
+    } finally {
+      setSessionBusyId(null);
+    }
+  }
+
+  async function handleRevokeOthers() {
+    setRevokingOthers(true);
+    try {
+      await revokeOtherSessions();
+      toast.success("Other sessions revoked");
+      await refreshSessions();
+    } catch (err: unknown) {
+      toastApiErrors(err, "Failed to revoke other sessions");
+    } finally {
+      setRevokingOthers(false);
+    }
+  }
+
+  async function handleDeleteAccount() {
+    setDeletingAccount(true);
+    try {
+      await deleteMyAccount();
+      await logout();
+      toast.success("Account deleted");
+      window.location.href = "/admin/login";
+    } catch (err: unknown) {
+      toastApiErrors(err, "Failed to delete account");
+    } finally {
+      setDeletingAccount(false);
+      setDeleteAccountOpen(false);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -99,6 +229,8 @@ function SecurityTab() {
               label="Current Password"
               type={showCurrent ? "text" : "password"}
               placeholder="••••••••"
+              value={currentPwd}
+              onChange={(e) => setCurrentPwd((e.target as HTMLInputElement).value)}
             />
             <button
               type="button"
@@ -151,6 +283,8 @@ function SecurityTab() {
               label="Confirm New Password"
               type={showConfirm ? "text" : "password"}
               placeholder="••••••••"
+              value={confirmPwd}
+              onChange={(e) => setConfirmPwd((e.target as HTMLInputElement).value)}
             />
             <button
               type="button"
@@ -161,7 +295,28 @@ function SecurityTab() {
             </button>
           </div>
 
-          <Button className="mt-2">Update Password</Button>
+          {pwdMsg && (
+            <p className={cn("text-xs font-medium", pwdMsg.ok ? "text-green-600" : "text-red-500")}>{pwdMsg.text}</p>
+          )}
+          <Button className="mt-2" disabled={saving} onClick={async () => {
+            const validationErrors = validateChangePasswordForm(currentPwd, newPwd, confirmPwd);
+            if (validationErrors.length > 0) {
+              toastValidationErrors(validationErrors);
+              setPwdMsg({ ok: false, text: validationErrors[0] });
+              return;
+            }
+            setSaving(true); setPwdMsg(null);
+            try {
+              await changePassword({ currentPassword: currentPwd, newPassword: newPwd, confirmPassword: confirmPwd });
+              setPwdMsg({ ok: true, text: "Password updated successfully." });
+              toast.success("Password updated successfully");
+              setCurrentPwd(""); setNewPwd(""); setConfirmPwd("");
+            } catch (err: unknown) {
+              setPwdMsg({ ok: false, text: "Failed to update password." });
+              toastApiErrors(err, "Failed to update password");
+            }
+            finally { setSaving(false); }
+          }}>{saving ? "Updating…" : "Update Password"}</Button>
         </div>
       </SectionCard>
 
@@ -191,22 +346,22 @@ function SecurityTab() {
               </p>
             </div>
           </div>
-          <Toggle enabled={twoFAEnabled} onChange={setTwoFAEnabled} />
+          <Toggle
+            enabled={twoFAEnabled}
+            onChange={async (next) => {
+              const prev = twoFAEnabled;
+              setTwoFAEnabled(next);
+              const ok = await persistSecurity({ twoFAEnabled: next });
+              if (!ok) setTwoFAEnabled(prev);
+            }}
+          />
         </div>
 
         {twoFAEnabled && (
           <div className="mt-5 p-4 bg-primary/5 border border-primary/10 rounded-xl">
             <p className="text-xs text-neutral-600 leading-relaxed">
-              Scan the QR code in your authenticator app, then enter the 6-digit code to verify setup.
+              Two-factor authentication is enabled and OTP verification will be required on login.
             </p>
-            <div className="flex gap-3 mt-3">
-              <Button size="sm" variant="outline" className="border-primary/20 text-primary bg-white hover:bg-primary/5">
-                Show QR Code
-              </Button>
-              <Button size="sm" variant="ghost" className="text-neutral-500">
-                View Recovery Codes
-              </Button>
-            </div>
           </div>
         )}
       </SectionCard>
@@ -233,7 +388,15 @@ function SecurityTab() {
                   <div className="text-xs text-neutral-400">{item.desc}</div>
                 </div>
               </div>
-              <Toggle enabled={item.state} onChange={item.set} />
+              <Toggle
+                enabled={item.state}
+                onChange={async (next) => {
+                  const prev = item.state;
+                  item.set(next);
+                  const ok = await persistSecurity({ loginAlerts: next });
+                  if (!ok) item.set(prev);
+                }}
+              />
             </div>
           ))}
         </div>
@@ -241,9 +404,12 @@ function SecurityTab() {
 
       {/* Active Sessions */}
       <SectionCard title="Active Sessions" description="Devices currently signed into your account.">
-        <div className="space-y-3">
-          {sessions.map((s, i) => (
-            <div key={i} className={cn(
+        {loadingSessions || securityLoading ? (
+          <p className="text-sm text-neutral-500">Loading active sessions...</p>
+        ) : (
+          <div className="space-y-3">
+            {sessions.map((s) => (
+              <div key={s.id} className={cn(
               "flex items-center justify-between p-4 rounded-xl border transition-colors",
               s.current ? "bg-primary/5 border-primary/15" : "bg-neutral-50 border-neutral-100"
             )}>
@@ -252,7 +418,7 @@ function SecurityTab() {
                   "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
                   s.current ? "bg-primary/10" : "bg-white border border-neutral-200"
                 )}>
-                  <Icon icon={s.icon} width={20} className={s.current ? "text-primary" : "text-neutral-400"} />
+                  <Icon icon={iconForSession(s.device)} width={20} className={s.current ? "text-primary" : "text-neutral-400"} />
                 </div>
                 <div>
                   <div className="text-sm font-semibold text-neutral-800 flex items-center gap-2">
@@ -267,21 +433,30 @@ function SecurityTab() {
                     <Icon icon="mdi:map-marker-outline" width={11} />
                     {s.location}
                     <span className="text-neutral-200">·</span>
-                    {s.time}
+                    {formatSessionTime(s.lastActiveAt)}
                   </div>
                 </div>
               </div>
               {!s.current && (
-                <button className="text-xs font-semibold text-red-400 hover:text-red-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50">
-                  Revoke
+                <button
+                  onClick={() => handleRevokeSession(s.id)}
+                  disabled={sessionBusyId === s.id}
+                  className="text-xs font-semibold text-red-400 hover:text-red-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50 disabled:opacity-60"
+                >
+                  {sessionBusyId === s.id ? "Revoking..." : "Revoke"}
                 </button>
               )}
             </div>
-          ))}
-        </div>
-        <button className="mt-4 text-xs font-bold text-red-400 hover:text-red-600 transition-colors flex items-center gap-1.5">
+            ))}
+          </div>
+        )}
+        <button
+          onClick={handleRevokeOthers}
+          disabled={revokingOthers || sessions.filter((s) => !s.current).length === 0}
+          className="mt-4 text-xs font-bold text-red-400 hover:text-red-600 transition-colors flex items-center gap-1.5 disabled:opacity-60"
+        >
           <Icon icon="mdi:logout-variant" width={14} />
-          Sign out all other sessions
+          {revokingOthers ? "Signing out others..." : "Sign out all other sessions"}
         </button>
       </SectionCard>
 
@@ -292,11 +467,28 @@ function SecurityTab() {
             <h4 className="text-sm font-bold text-neutral-900 mb-0.5">Delete Account</h4>
             <p className="text-xs text-neutral-400">Permanently remove your account and all associated data. This cannot be undone.</p>
           </div>
-          <Button variant="destructive" size="sm" className="shrink-0 ml-6">
+          <Button variant="destructive" size="sm" className="shrink-0 ml-6" onClick={() => setDeleteAccountOpen(true)}>
             Delete Account
           </Button>
         </div>
       </SectionCard>
+
+      <Modal
+        isOpen={deleteAccountOpen}
+        onClose={() => !deletingAccount && setDeleteAccountOpen(false)}
+        title="Delete Account"
+        description="This action cannot be undone."
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setDeleteAccountOpen(false)} disabled={deletingAccount}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDeleteAccount} disabled={deletingAccount}>
+              {deletingAccount ? "Deleting..." : "Delete Account"}
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm text-neutral-600">All account data and sessions will be removed permanently.</p>
+      </Modal>
 
     </div>
   );
@@ -313,12 +505,22 @@ function SeoTab() {
   const [indexing, setIndexing] = useState(true);
   const [sitemapEnabled, setSitemapEnabled] = useState(true);
   const [ogImage, setOgImage] = useState<string | null>(null);
-  const ogInputRef = useRef<HTMLInputElement>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState<string | null>(null);
 
-  const handleOgImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) setOgImage(URL.createObjectURL(file));
-  };
+  useEffect(() => {
+    getSettings().then((res) => {
+      const s = res.data;
+      if (!s) return;
+      if (s.metaTitle) setMetaTitle(s.metaTitle);
+      if (s.metaDescription) setMetaDesc(s.metaDescription);
+      if (s.keywords) setKeywords(Array.isArray(s.keywords) ? s.keywords.join(", ") : s.keywords);
+      if (s.canonicalUrl) setCanonicalUrl(s.canonicalUrl);
+      if (s.indexingEnabled !== undefined) setIndexing(s.indexingEnabled);
+      if (s.sitemapEnabled !== undefined) setSitemapEnabled(s.sitemapEnabled);
+      if (s.ogImage) setOgImage(s.ogImage);
+    }).catch(() => {});
+  }, []);
 
   const titleLength = metaTitle.length;
   const descLength = metaDesc.length;
@@ -349,7 +551,7 @@ function SeoTab() {
               type="textarea"
               value={metaDesc}
               onChange={(e) => setMetaDesc((e.target as HTMLTextAreaElement).value)}
-              className="min-h-[90px]"
+              className="min-h-22.5"
               maxLength={160}
             />
             <div className="flex justify-end mt-1">
@@ -387,32 +589,7 @@ function SeoTab() {
       {/* OG / Social */}
       <SectionCard title="Social Sharing" description="Customize how your site looks when shared on LinkedIn, Twitter, and Facebook.">
         <div className="space-y-5">
-          <div>
-            <label className="text-sm font-medium text-neutral-700 block mb-2">OG Image (1200×630px recommended)</label>
-            <input ref={ogInputRef} type="file" accept="image/*" className="hidden" onChange={handleOgImageChange} />
-            {ogImage ? (
-              <div className="relative w-full h-44 rounded-xl overflow-hidden border border-neutral-200 group">
-                <Image src={ogImage} alt="OG Preview" fill style={{ objectFit: "cover" }} sizes="600px" />
-                <div className="absolute inset-0 bg-neutral-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <button
-                    onClick={() => ogInputRef.current?.click()}
-                    className="bg-white text-neutral-800 text-xs font-bold px-4 py-2 rounded-lg"
-                  >
-                    Replace Image
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div
-                onClick={() => ogInputRef.current?.click()}
-                className="w-full h-36 border-2 border-dashed border-neutral-200 rounded-xl flex flex-col items-center justify-center bg-neutral-50 hover:bg-primary/5 hover:border-primary/30 transition-all cursor-pointer group"
-              >
-                <Icon icon="mdi:image-plus-outline" width={30} className="text-neutral-300 group-hover:text-primary mb-2 transition-colors" />
-                <p className="text-sm font-medium text-neutral-400 group-hover:text-primary transition-colors">Upload OG Image</p>
-                <p className="text-[10px] text-neutral-300 mt-1">PNG or JPG, 1200×630px</p>
-              </div>
-            )}
-          </div>
+          <ImageUpload label="OG Image (1200×630px recommended)" folder="settings/seo" value={ogImage ?? ""} onChange={(url) => setOgImage(url || null)} />
         </div>
 
         {/* Social card preview */}
@@ -476,11 +653,35 @@ function SeoTab() {
         </div>
       </SectionCard>
 
+      {saveMsg && <p className="text-xs font-medium text-green-600">{saveMsg}</p>}
+      <Button disabled={saving} onClick={async () => {
+        const validationErrors = validateSeoSettingsForm({
+          metaTitle,
+          metaDescription: metaDesc,
+          canonicalUrl,
+          ogImage,
+        });
+        if (validationErrors.length > 0) {
+          toastValidationErrors(validationErrors);
+          setSaveMsg("Please fix validation errors.");
+          return;
+        }
+
+        setSaving(true); setSaveMsg(null);
+        try {
+          await updateSettings({ metaTitle, metaDescription: metaDesc, keywords: keywords.split(",").map((k) => k.trim()), canonicalUrl, indexingEnabled: indexing, sitemapEnabled, ogImage: ogImage ?? undefined });
+          setSaveMsg("SEO settings saved.");
+          toast.success("SEO settings saved");
+        } catch (err: unknown) {
+          setSaveMsg("Failed to save.");
+          toastApiErrors(err, "Failed to save SEO settings");
+        }
+        finally { setSaving(false); }
+      }}>{saving ? "Saving…" : "Save SEO Settings"}</Button>
+
     </div>
   );
 }
-
-/* ─── BRANDING TAB ───────────────────────────────────────────── */
 function BrandingTab() {
   const [primaryColor, setPrimaryColor] = useState("#B75E1A");
   const [secondaryColor, setSecondaryColor] = useState("#231F1C");
@@ -489,15 +690,22 @@ function BrandingTab() {
   const [logoDark, setLogoDark] = useState<string | null>(null);
   const [favicon, setFavicon] = useState<string | null>(null);
   const [selectedFont, setSelectedFont] = useState("Inter");
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState<string | null>(null);
 
-  const logoLightRef = useRef<HTMLInputElement>(null);
-  const logoDarkRef = useRef<HTMLInputElement>(null);
-  const faviconRef = useRef<HTMLInputElement>(null);
-
-  const handleImage = (setter: (s: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (f) setter(URL.createObjectURL(f));
-  };
+  useEffect(() => {
+    getSettings().then((res) => {
+      const s = res.data;
+      if (!s) return;
+      if (s.primaryColor) setPrimaryColor(s.primaryColor);
+      if (s.secondaryColor) setSecondaryColor(s.secondaryColor);
+      if (s.accentColor) setAccentColor(s.accentColor);
+      if (s.logoLight) setLogoLight(s.logoLight);
+      if (s.logoDark) setLogoDark(s.logoDark);
+      if (s.favicon) setFavicon(s.favicon);
+      if (s.font) setSelectedFont(s.font);
+    }).catch(() => {});
+  }, []);
 
   const fonts = ["Inter", "Playfair Display", "DM Sans", "Sora", "Outfit"];
 
@@ -565,66 +773,12 @@ function BrandingTab() {
       {/* Logo */}
       <SectionCard title="Logo & Identity" description="Upload separate versions for light and dark backgrounds.">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-          {[
-            { label: "Light Background Logo", ref: logoLightRef, value: logoLight, set: setLogoLight, bg: "bg-white" },
-            { label: "Dark Background Logo", ref: logoDarkRef, value: logoDark, set: setLogoDark, bg: "bg-[#231F1C]" },
-          ].map((item) => (
-            <div key={item.label}>
-              <input ref={item.ref} type="file" accept="image/*" className="hidden" onChange={handleImage(item.set)} />
-              <label className="text-sm font-medium text-neutral-700 block mb-2">{item.label}</label>
-              <div
-                onClick={() => item.ref.current?.click()}
-                className={cn(
-                  "w-full h-28 rounded-xl border-2 flex items-center justify-center cursor-pointer transition-all group relative overflow-hidden",
-                  item.value ? "border-neutral-200" : "border-dashed border-neutral-200 hover:border-primary/30",
-                  item.bg
-                )}
-              >
-                {item.value ? (
-                  <>
-                    <Image src={item.value} alt={item.label} fill style={{ objectFit: "contain" }} sizes="280px" className="p-4" />
-                    <div className="absolute inset-0 bg-neutral-900/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <span className="text-white text-xs font-bold bg-neutral-900/60 px-3 py-1.5 rounded-lg">Replace</span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex flex-col items-center text-neutral-300 group-hover:text-primary/50 transition-colors">
-                    <Icon icon="mdi:image-plus-outline" width={28} className="mb-1.5" />
-                    <span className="text-xs font-medium">Upload Logo</span>
-                    <span className="text-[10px] mt-0.5">SVG or PNG</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
+          <ImageUpload label="Light Background Logo" folder="settings/branding" value={logoLight ?? ""} onChange={(url) => setLogoLight(url || null)} />
+          <ImageUpload label="Dark Background Logo" folder="settings/branding" value={logoDark ?? ""} onChange={(url) => setLogoDark(url || null)} />
         </div>
 
         {/* Favicon */}
-        <div>
-          <input ref={faviconRef} type="file" accept="image/*" className="hidden" onChange={handleImage(setFavicon)} />
-          <label className="text-sm font-medium text-neutral-700 block mb-2">Favicon</label>
-          <div className="flex items-center gap-4">
-            <div
-              onClick={() => faviconRef.current?.click()}
-              className="w-16 h-16 rounded-xl border-2 border-dashed border-neutral-200 hover:border-primary/30 flex items-center justify-center cursor-pointer bg-neutral-50 hover:bg-primary/5 transition-all relative overflow-hidden shrink-0 group"
-            >
-              {favicon ? (
-                <>
-                  <Image src={favicon} alt="Favicon" fill style={{ objectFit: "contain" }} sizes="64px" className="p-1.5" />
-                  <div className="absolute inset-0 bg-neutral-900/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Icon icon="mdi:pencil-outline" width={14} className="text-white" />
-                  </div>
-                </>
-              ) : (
-                <Icon icon="mdi:image-plus-outline" width={20} className="text-neutral-300 group-hover:text-primary transition-colors" />
-              )}
-            </div>
-            <div>
-              <p className="text-sm font-medium text-neutral-700">Browser Tab Icon</p>
-              <p className="text-xs text-neutral-400 mt-0.5">32×32px or 64×64px ICO, PNG, or SVG.</p>
-            </div>
-          </div>
-        </div>
+        <ImageUpload label="Favicon" folder="settings/branding" value={favicon ?? ""} onChange={(url) => setFavicon(url || null)} />
       </SectionCard>
 
       {/* Typography */}
@@ -656,21 +810,48 @@ function BrandingTab() {
         </div>
       </SectionCard>
 
+      {saveMsg && <p className="text-xs font-medium text-green-600">{saveMsg}</p>}
+      <Button disabled={saving} onClick={async () => {
+        const validationErrors = validateBrandingSettingsForm({
+          primaryColor,
+          secondaryColor,
+          accentColor,
+          logoLight,
+          logoDark,
+          favicon,
+        });
+        if (validationErrors.length > 0) {
+          toastValidationErrors(validationErrors);
+          setSaveMsg("Please fix validation errors.");
+          return;
+        }
+
+        setSaving(true); setSaveMsg(null);
+        try {
+          await updateSettings({ primaryColor, secondaryColor, accentColor, logoLight: logoLight ?? undefined, logoDark: logoDark ?? undefined, favicon: favicon ?? undefined, font: selectedFont });
+          setSaveMsg("Branding settings saved.");
+          toast.success("Branding settings saved");
+        } catch (err: unknown) {
+          setSaveMsg("Failed to save.");
+          toastApiErrors(err, "Failed to save branding settings");
+        }
+        finally { setSaving(false); }
+      }}>{saving ? "Saving…" : "Save Branding"}</Button>
+
     </div>
   );
 }
 
 /* ─── PROFILE TAB ────────────────────────────────────────────── */
 function ProfileTab() {
+  const { user } = useAuth();
   return (
     <div className="space-y-6">
-      <SectionCard title="Personal Information" description="Update your account details and public profile.">
+      <SectionCard title="Personal Information" description="Your account details.">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-          <Input label="First Name" defaultValue="Alex" />
-          <Input label="Last Name" defaultValue="Morgan" />
+          <Input label="Email Address" defaultValue={user?.email ?? ""} readOnly />
+          <Input label="Role" defaultValue={user?.role ?? ""} readOnly />
         </div>
-        <Input label="Email Address" defaultValue="alex.morgan@neeza.com" className="mb-5" />
-        <Input label="Phone Number" defaultValue="+250 788 000 000" />
       </SectionCard>
     </div>
   );
