@@ -5,41 +5,52 @@ import Image from "next/image";
 import { getProjects } from "@/lib/api/projects";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
-import { Icon } from "@iconify/react";
+import { useSearchParams } from "next/navigation";
 import type { Project } from "@/types";
 
-const filters = [
-  { label: "All Projects",      icon: "mdi:view-grid-outline" },
-  { label: "Architecture",      icon: "mdi:office-building-outline" },
-  { label: "Civil Engineering", icon: "mdi:bridge" },
-  { label: "Project Management",icon: "mdi:clipboard-list-outline" },
-  { label: "Masterplanning",    icon: "mdi:map-outline" },
-  { label: "Interior",          icon: "mdi:sofa-outline" },
-  { label: "Completed",         icon: "mdi:check-circle-outline" },
-  { label: "Ongoing",           icon: "mdi:progress-clock" },
+const categoryFilters = [
+  { label: "All Categories" },
+  { label: "Architecture" },
+  { label: "Civil Engineering" },
+  { label: "Project Management" },
+  { label: "Masterplanning" },
+  { label: "Interior" },
+];
+
+const statusFilters = [
+  { label: "All Statuses" },
+  { label: "Ongoing" },
+  { label: "Completed" },
+  { label: "Handed Over" },
+  { label: "Consulted" },
 ];
 
 export default function ProjectsPage() {
-  const [activeFilter, setActiveFilter] = useState("All Projects");
+  const searchParams = useSearchParams();
+  const [activeCategory, setActiveCategory] = useState(() => {
+    const incomingCategory = searchParams.get("category");
+    return incomingCategory && categoryFilters.some((c) => c.label === incomingCategory)
+      ? incomingCategory
+      : "All Categories";
+  });
+  const [activeStatus, setActiveStatus] = useState(() => {
+    const incomingStatus = searchParams.get("status");
+    return incomingStatus && statusFilters.some((s) => s.label === incomingStatus)
+      ? incomingStatus
+      : "All Statuses";
+  });
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const params: Record<string, string> = {};
-    if (activeFilter !== "All Projects") {
-      if (activeFilter === "Completed" || activeFilter === "Ongoing") {
-        params.status = activeFilter;
-      } else {
-        params.category = activeFilter;
-      }
-    }
-    setLoading(true);
+    if (activeCategory !== "All Categories") params.category = activeCategory;
+    if (activeStatus !== "All Statuses") params.status = activeStatus;
+
     getProjects({ ...params, limit: 50 }).then((res) => {
       setProjects(res.data?.data ?? []);
     }).catch(() => {}).finally(() => setLoading(false));
-  }, [activeFilter]);
-
-  const isActive = (label: string) => activeFilter === label;
+  }, [activeCategory, activeStatus]);
 
   return (
     <div className="flex flex-col flex-1 w-full bg-neutral-50">
@@ -65,21 +76,31 @@ export default function ProjectsPage() {
 
       <div className="container mx-auto px-4 md:px-8 max-w-7xl py-24">
         {/* Filters */}
-        <div className="flex flex-wrap gap-3 mb-12">
-          {filters.map(({ label, icon }) => (
-            <button
-              key={label}
-              onClick={() => setActiveFilter(label)}
-              className={cn(
-                "inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200",
-                isActive(label) ? "bg-primary text-white shadow-md shadow-primary/25" : "text-neutral-900 hover:brightness-95 active:brightness-90"
-              )}
-              style={isActive(label) ? undefined : { backgroundColor: "#F3ECE8" }}
+        <div className="flex flex-col sm:flex-row gap-4 mb-12">
+          <div className="flex-1">
+            <label className="block text-xs font-bold tracking-widest uppercase text-neutral-500 mb-2">Category</label>
+            <select
+              value={activeCategory}
+              onChange={(e) => { setLoading(true); setActiveCategory(e.target.value); }}
+              className="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-white text-sm font-medium text-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
             >
-              <Icon icon={icon} width={16} height={16} style={{ color: isActive(label) ? "rgba(255,255,255,0.85)" : "#B75E1ACC" }} />
-              {label}
-            </button>
-          ))}
+              {categoryFilters.map(({ label }) => (
+                <option key={label} value={label}>{label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex-1">
+            <label className="block text-xs font-bold tracking-widest uppercase text-neutral-500 mb-2">Status</label>
+            <select
+              value={activeStatus}
+              onChange={(e) => { setLoading(true); setActiveStatus(e.target.value); }}
+              className="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-white text-sm font-medium text-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
+            >
+              {statusFilters.map(({ label }) => (
+                <option key={label} value={label}>{label}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {loading ? (

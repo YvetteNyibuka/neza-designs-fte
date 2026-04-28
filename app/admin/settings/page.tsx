@@ -496,7 +496,7 @@ function SecurityTab() {
 
 /* ─── SEO TAB ────────────────────────────────────────────────── */
 function SeoTab() {
-  const [metaTitle, setMetaTitle] = useState("NEEZA Designs | African Architecture & Engineering");
+  const [metaTitle, setMetaTitle] = useState("NEEZA | African Architecture & Engineering");
   const [metaDesc, setMetaDesc] = useState(
     "East Africa's premier architecture and engineering consultancy, crafting sustainable, luxury built environments rooted in African heritage."
   );

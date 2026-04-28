@@ -1,4 +1,4 @@
-import { Project, BlogPost, TeamMember, Service } from "@/types";
+import { Project, BlogPost, TeamMember, Career, Publication } from "@/types";
 
 export const dummyProjects: Project[] = [
   {
@@ -10,7 +10,7 @@ export const dummyProjects: Project[] = [
     description: "A sustainable luxury residence featuring solar integration and locally sourced volcanic stone finishes.",
     imageUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
     location: "Kigali, Rwanda",
-    completionYear: 2022
+    completionYear: 2022,
   },
   {
     _id: "2",
@@ -31,7 +31,7 @@ export const dummyProjects: Project[] = [
     description: "Blending seamlessly with nature, this lodge offers luxury with zero environmental impact.",
     imageUrl: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop",
     location: "Kigali, Rwanda",
-    completionYear: 2023
+    completionYear: 2023,
   },
   {
     _id: "4",
@@ -42,7 +42,7 @@ export const dummyProjects: Project[] = [
     description: "A sustainable hospitality lodge integrated within the natural landscape.",
     imageUrl: "https://images.unsplash.com/photo-1510798831971-661eb04b3739?q=80&w=1974&auto=format&fit=crop",
     location: "Akagera, Rwanda",
-    completionYear: 2021
+    completionYear: 2021,
   },
   {
     _id: "5",
@@ -63,7 +63,7 @@ export const dummyProjects: Project[] = [
     description: "Masterplan for a sustainable, net-zero greenhouse emission neighborhood.",
     imageUrl: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1955&auto=format&fit=crop",
     location: "Kigali, Rwanda",
-  }
+  },
 ];
 
 export const dummyPosts: BlogPost[] = [
@@ -79,8 +79,8 @@ export const dummyPosts: BlogPost[] = [
     imageUrl: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1955&auto=format&fit=crop",
     author: {
       name: "Jean-Paul Nilan.",
-      role: "Chief Architect"
-    }
+      role: "Chief Architect",
+    },
   },
   {
     _id: "2",
@@ -94,8 +94,8 @@ export const dummyPosts: BlogPost[] = [
     imageUrl: "https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=2000&auto=format&fit=crop",
     author: {
       name: "Elena Kagame",
-      role: "Sustainability Lead"
-    }
+      role: "Sustainability Lead",
+    },
   },
   {
     _id: "3",
@@ -109,8 +109,8 @@ export const dummyPosts: BlogPost[] = [
     imageUrl: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=2070&auto=format&fit=crop",
     author: {
       name: "David Mutungi",
-      role: "Civil Engineer"
-    }
+      role: "Civil Engineer",
+    },
   },
   {
     _id: "4",
@@ -124,9 +124,9 @@ export const dummyPosts: BlogPost[] = [
     imageUrl: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=2070&auto=format&fit=crop",
     author: {
       name: "Sarah Mwebaza",
-      role: "Interior Designer"
-    }
-  }
+      role: "Interior Designer",
+    },
+  },
 ];
 
 export const dummyTeam: TeamMember[] = [
@@ -135,20 +135,179 @@ export const dummyTeam: TeamMember[] = [
     name: "Yves Karangwa",
     role: "MD & Co-Founder",
     bio: "15 years of experience leading major commercial developments across East Africa.",
-    imageUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1974&auto=format&fit=crop"
+    imageUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1974&auto=format&fit=crop",
   },
   {
     _id: "2",
     name: "Jean Karangwa",
     role: "MD & Co-Founder",
     bio: "12 years of experience leading major commercial developments across East Africa.",
-    imageUrl: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1974&auto=format&fit=crop"
+    imageUrl: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1974&auto=format&fit=crop",
   },
   {
     _id: "3",
     name: "Tony Karangwa",
     role: "MD & Co-Founder",
     bio: "10 years of experience leading major commercial developments across East Africa.",
-    imageUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop"
-  }
+    imageUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop",
+  },
+];
+
+export const dummyCareers: Career[] = [
+  {
+    _id: "c1",
+    slug: "senior-architect",
+    title: "Senior Architect",
+    department: "Architecture",
+    location: "Kigali, Rwanda",
+    employmentType: "Full-time",
+    experienceLevel: "Senior",
+    description: "Lead concept and detailed design on a variety of residential and commercial projects across East Africa. You will mentor junior architects and coordinate with engineers and clients from brief to handover.",
+    requirements: [
+      "Bachelor's or Master's degree in Architecture",
+      "7+ years of professional experience",
+      "Proficiency in AutoCAD, Revit, and SketchUp",
+      "Strong portfolio of delivered projects",
+    ],
+    responsibilities: [
+      "Develop architectural designs from concept through to construction documentation",
+      "Lead client presentations and design reviews",
+      "Coordinate with structural and MEP engineers",
+      "Mentor and review work of junior team members",
+    ],
+    applyEmail: "careers@neeza.rw",
+    status: "Open",
+    featured: true,
+    createdAt: "2025-01-15T08:00:00Z",
+  },
+  {
+    _id: "c2",
+    slug: "civil-engineer-infrastructure",
+    title: "Civil Engineer - Infrastructure",
+    department: "Civil Engineering",
+    location: "Kigali, Rwanda",
+    employmentType: "Full-time",
+    experienceLevel: "Mid",
+    description: "Design and oversee infrastructure systems including roads, drainage, and utilities for large-scale urban development projects.",
+    requirements: [
+      "BSc in Civil Engineering",
+      "4+ years of relevant infrastructure experience",
+      "Proficiency in AutoCAD Civil 3D",
+      "Experience with EIA and permitting processes in Rwanda",
+    ],
+    responsibilities: [
+      "Prepare detailed civil engineering designs and drawings",
+      "Conduct site surveys and investigations",
+      "Supervise construction works and ensure compliance",
+      "Prepare bills of quantities and technical reports",
+    ],
+    applyEmail: "careers@neeza.rw",
+    status: "Open",
+    featured: false,
+    createdAt: "2025-02-10T08:00:00Z",
+  },
+  {
+    _id: "c3",
+    slug: "project-manager",
+    title: "Project Manager",
+    department: "Project Management",
+    location: "Kigali, Rwanda",
+    employmentType: "Full-time",
+    experienceLevel: "Lead",
+    description: "Oversee end-to-end delivery of construction and development projects, managing timelines, budgets, subcontractors, and client relationships.",
+    requirements: [
+      "Degree in Engineering, Architecture, or Construction Management",
+      "PMP or PRINCE2 certification preferred",
+      "8+ years of project management experience",
+      "Strong proficiency in MS Project or Primavera",
+    ],
+    responsibilities: [
+      "Manage project schedules, budgets, and risk registers",
+      "Coordinate all project stakeholders and contractors",
+      "Prepare and present monthly progress reports",
+      "Ensure health, safety, and quality standards are met",
+    ],
+    applyEmail: "careers@neeza.rw",
+    status: "Open",
+    featured: true,
+    createdAt: "2025-03-05T08:00:00Z",
+  },
+  {
+    _id: "c4",
+    slug: "interior-designer",
+    title: "Interior Designer",
+    department: "Interior Design",
+    location: "Kigali, Rwanda",
+    employmentType: "Contract",
+    experienceLevel: "Mid",
+    description: "Create compelling and functional interior design concepts for luxury residential and hospitality projects across the region.",
+    requirements: [
+      "Degree in Interior Design or Architecture",
+      "4+ years of experience in luxury residential or hospitality projects",
+      "Proficiency in 3ds Max, V-Ray, and Adobe Suite",
+    ],
+    responsibilities: [
+      "Develop interior design concepts and mood boards",
+      "Specify materials, finishes, furniture, and lighting",
+      "Produce detailed interior drawings and schedules",
+      "Liaise with contractors and procurement teams during implementation",
+    ],
+    applyEmail: "careers@neeza.rw",
+    status: "Open",
+    featured: false,
+    createdAt: "2025-03-20T08:00:00Z",
+  },
+];
+
+export const dummyPublications: Publication[] = [
+  {
+    _id: "p1",
+    slug: "east-africa-urban-growth-report-2024",
+    title: "East Africa Urban Growth Report 2024",
+    summary: "A comprehensive analysis of urbanisation trends across Rwanda, Kenya, Uganda, and Tanzania with projections through 2035, covering housing demand, infrastructure gaps, and investment opportunities.",
+    type: "Report",
+    publishedAt: "2024-06-01T00:00:00Z",
+    coverImage: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1955&auto=format&fit=crop",
+    tags: ["urbanisation", "Rwanda", "East Africa", "infrastructure"],
+  },
+  {
+    _id: "p2",
+    slug: "neeza-project-portfolio-2023",
+    title: "NEEZA Project Portfolio 2023",
+    summary: "An illustrated overview of all major projects completed or under execution by NEEZA Designs in 2023, spanning architecture, civil engineering, and masterplanning engagements.",
+    type: "Portfolio",
+    publishedAt: "2024-01-15T00:00:00Z",
+    coverImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
+    tags: ["portfolio", "2023", "projects"],
+  },
+  {
+    _id: "p3",
+    slug: "rwanda-building-regulations-guide",
+    title: "Rwanda Building Regulations: Practitioner's Guide",
+    summary: "A plain-language guide for architects, engineers, and developers navigating the Rwanda Urban Planning and Building Control Act, permit procedures, zoning requirements, and structural standards.",
+    type: "Guide",
+    publishedAt: "2024-03-10T00:00:00Z",
+    coverImage: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2071&auto=format&fit=crop",
+    tags: ["law", "building regulations", "Rwanda", "compliance"],
+  },
+  {
+    _id: "p4",
+    slug: "sustainable-construction-policy-brief",
+    title: "Sustainable Construction in Africa: Policy Brief",
+    summary: "Key policy recommendations for governments and development finance institutions to accelerate adoption of green building standards and sustainable construction practices across Sub-Saharan Africa.",
+    type: "Policy",
+    publishedAt: "2024-08-20T00:00:00Z",
+    coverImage: "https://images.unsplash.com/photo-1590479773265-7464e5d48118?q=80&w=2070&auto=format&fit=crop",
+    tags: ["policy", "sustainability", "green building", "Africa"],
+  },
+  {
+    _id: "p5",
+    slug: "kigali-masterplan-insights",
+    title: "Kigali Masterplan Insights: Lessons for African Cities",
+    summary: "Drawing from NEEZA's direct experience with Kigali City's urban development framework, this paper shares transferable lessons on mixed-use zoning, transport-oriented development, and affordable housing integration.",
+    type: "Report",
+    publishedAt: "2025-01-10T00:00:00Z",
+    coverImage: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=2070&auto=format&fit=crop",
+    tags: ["masterplan", "Kigali", "urban design", "housing"],
+  },
 ];

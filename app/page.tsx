@@ -39,15 +39,14 @@ export default function Home() {
 
         {/* Hero Content */}
         <div className="relative z-10 container mx-auto px-4 md:px-8 max-w-7xl flex flex-col items-center text-center mt-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#DAA119]/20 bg-[#DAA119]/30 px-3 py-1 text-xs font-semibold text-[#DAA119] tracking-widest uppercase mb-6 backdrop-blur-sm">
-            East Africa's Premier Consultancy
+          <div className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/30 px-3 py-1 text-xs font-semibold text-accent tracking-widest uppercase mb-6 backdrop-blur-sm">
+            From land to legacy
           </div>
           <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl font-bold text-white max-w-4xl tracking-tight leading-tight">
-            Designing Sustainable Communities <span className="text-[#DAA119]"> &amp; </span>  Cities of the Future
+            To shape land into enduring <span className="text-accent"> &amp; </span>  high-value developments.
           </h1>
           <p className="mt-6 text-lg md:text-xl text-neutral-200 max-w-2xl font-light">
-            Experience ultra-modern luxury and sustainable engineering with East Africa's premier consultancy firm.
-          </p>
+To deliver integrated solutions in land, design, and construction with precision and excellence.          </p>
           
           <div className="mt-10 flex flex-col sm:flex-row gap-4">
             <Button size="lg" className="w-full sm:w-auto h-14 px-8 text-base shadow-xl">
@@ -176,7 +175,7 @@ export default function Home() {
                 {/* Default state: icon + title at bottom */}
                 <div className="absolute inset-0 flex flex-col justify-end p-8 transition-all duration-300 z-10">
                   {/* Icon */}
-                  <div className="text-white mb-4 group-hover:text-[#DAA119] transition-all duration-300 shrink-0">
+                  <div className="text-white mb-4 group-hover:text-accent transition-all duration-300 shrink-0">
                     {service.icon}
                   </div>
 
@@ -191,6 +190,68 @@ export default function Home() {
                   </p>
                 </div>
               </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stakeholders / Partners */}
+      <section className="py-20 bg-white border-y border-neutral-100 overflow-hidden">
+        <div className="container mx-auto px-4 md:px-8 max-w-7xl mb-10">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <div>
+              <h4 className="text-primary font-bold text-xs tracking-widest uppercase mb-3">Partners &amp; Stakeholders</h4>
+              <h2 className="font-heading text-2xl md:text-3xl font-bold text-neutral-900">Trusted by Public and Private Partners</h2>
+            </div>
+            <p className="text-neutral-500 text-sm md:max-w-md leading-relaxed">
+              We collaborate with institutions, developers, and communities to deliver resilient, high-impact projects across the region.
+            </p>
+          </div>
+        </div>
+
+        {/* Infinite marquee — items duplicated for seamless loop */}
+        <div className="relative overflow-hidden">
+          {/* Fade edges */}
+          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-24 z-10 bg-linear-to-r from-white to-transparent" />
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-24 z-10 bg-linear-to-l from-white to-transparent" />
+
+          <div className="flex animate-marquee w-max gap-8 py-2">
+            {[
+              "Rwanda Housing Authority",
+              "Kigali City Council",
+              "Rwanda Development Board",
+              "Private Developers",
+              "Infrastructure Partners",
+              "Community Boards",
+              "Ministry of Infrastructure",
+              "East Africa Development Bank",
+            ].concat([
+              "Rwanda Housing Authority",
+              "Kigali City Council",
+              "Rwanda Development Board",
+              "Private Developers",
+              "Infrastructure Partners",
+              "Community Boards",
+              "Ministry of Infrastructure",
+              "East Africa Development Bank",
+            ]).map((name, i) => (
+              <div
+                key={i}
+                className="flex flex-col items-center gap-3 shrink-0 w-36 group"
+              >
+                <div className="w-20 h-20 rounded-full bg-neutral-50 border border-neutral-200 shadow-sm flex items-center justify-center overflow-hidden group-hover:border-primary/40 group-hover:shadow-md transition-all duration-300">
+                  <Image
+                    src="/logos/BprimaryLogo.png"
+                    alt={name}
+                    width={44}
+                    height={44}
+                    className="object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+                  />
+                </div>
+                <p className="text-xs font-semibold text-neutral-500 text-center leading-tight group-hover:text-primary transition-colors duration-300">
+                  {name}
+                </p>
+              </div>
             ))}
           </div>
         </div>
@@ -220,7 +281,7 @@ export default function Home() {
                 <Image src={project.imageUrl} alt={project.title} fill style={{ objectFit: "cover" }} className="group-hover:scale-105 transition-transform duration-100" />
                 <div className="absolute inset-0 bg-linear-to-t from-neutral-900/90 via-neutral-900/20 to-transparent" />
                 <div className="absolute bottom-8 left-8 right-8">
-                  <div className="text-[#DAA119] text-xs font-bold tracking-widest uppercase mb-2">
+                  <div className="text-accent text-xs font-bold tracking-widest uppercase mb-2">
                     {project.category}
                   </div>
                   <h3 className="text-white font-heading text-2xl font-bold mb-4">{project.title}</h3>
@@ -229,7 +290,7 @@ export default function Home() {
                       {project.description}
                     </p>
                   </div>
-                  <Link href={`/projects`} className="text-white text-sm font-medium transition-colors inline-block border-b border-[#DAA119] pb-1">
+                  <Link href={`/projects`} className="text-white text-sm font-medium transition-colors inline-block border-b border-accent pb-1">
                     View Case Study
                   </Link>
                 </div>
@@ -246,7 +307,7 @@ export default function Home() {
             Ready to Build the Extraordinary?
           </h2>
           <p className="text-white/80 text-lg mb-10 max-w-2xl mx-auto">
-            Whether it's a commercial landmark or a private sanctuary, let's bring your vision to life with precision and elegance.
+            Whether it&apos;s a commercial landmark or a private sanctuary, let&apos;s bring your vision to life with precision and elegance.
           </p>
           <Button size="lg" className="bg-white text-primary hover:bg-neutral-100 h-14 px-8 text-base">
             Schedule a Consultation

@@ -10,6 +10,8 @@ import {
   Wrench, 
   Users, 
   Mail,
+  Briefcase,
+  BookOpen,
   Settings, 
   LogOut 
 } from "lucide-react";
@@ -21,6 +23,8 @@ const sidebarLinks = [
   { name: "Services", href: "/admin/services", icon: Wrench },
   { name: "Team", href: "/admin/team", icon: Users },
   { name: "Inquiries", href: "/admin/inquiries", icon: Mail },
+  { name: "Careers", href: "/admin/careers", icon: Briefcase },
+  { name: "Publications", href: "/admin/publications", icon: BookOpen },
   // { name: "Media Library", href: "/admin/media", icon: ImageIcon },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
@@ -32,12 +36,9 @@ export function AdminSidebar() {
     <aside className="w-64 bg-neutral-50/50 border-r border-neutral-200 flex flex-col h-screen fixed top-0 left-0">
       {/* Brand */}
       <div className="h-24 flex items-center justify-center border-b border-neutral-200">
-        <Link href="/admin" className="flex flex-col items-center">
+        <Link href="/admin" className="flex items-center">
           <span className="font-heading font-bold text-2xl tracking-tighter leading-none text-primary">
             NEEZA
-          </span>
-          <span className="text-[0.6rem] font-bold tracking-widest uppercase text-neutral-700 mt-1">
-            Designs Ltd.
           </span>
         </Link>
       </div>

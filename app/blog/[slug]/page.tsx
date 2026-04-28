@@ -331,7 +331,7 @@ export default function BlogPostPage({
                 {post.author.name}
               </h3>
               <div className="text-sm text-primary font-semibold mb-3">
-                {post.author.role} — NEEZA Designs
+                {post.author.role} — NEEZA
               </div>
               <p className="text-neutral-500 text-sm leading-relaxed max-w-xl">
                 A thought leader in sustainable architecture and urban development

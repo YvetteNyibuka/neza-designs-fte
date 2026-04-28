@@ -8,6 +8,16 @@ import { Icon } from "@iconify/react";
 import { getServices } from "@/lib/api/services";
 import type { Service } from "@/types";
 
+function serviceToProjectCategory(serviceTitle: string): string {
+  const lower = serviceTitle.toLowerCase();
+  if (lower.includes("architecture")) return "Architecture";
+  if (lower.includes("civil")) return "Civil Engineering";
+  if (lower.includes("project management")) return "Project Management";
+  if (lower.includes("masterplanning") || lower.includes("urban")) return "Masterplanning";
+  if (lower.includes("interior")) return "Interior";
+  return "Architecture";
+}
+
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,9 +90,18 @@ export default function ServicesPage() {
                   })}
                 </div>
                 <div className="mt-12">
-                  <Button variant="outline" className="border-black text-black rounded-md bg-white hover:bg-black hover:text-white transition-colors duration-100">
-                    {svc.buttonTitle ?? "Learn More"}
-                  </Button>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Link href={`/contact?service=${encodeURIComponent(svc.title)}`}>
+                      <Button className="rounded-md">
+                        {svc.buttonTitle ?? "Request This Service"}
+                      </Button>
+                    </Link>
+                    <Link href={`/projects?category=${encodeURIComponent(serviceToProjectCategory(svc.title))}`}>
+                      <Button variant="outline" className="border-black text-black rounded-md bg-white hover:bg-black hover:text-white transition-colors duration-100">
+                        View Related Projects
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </div>
               <div className="flex-1 w-full">

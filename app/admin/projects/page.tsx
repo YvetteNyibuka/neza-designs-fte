@@ -17,7 +17,7 @@ import { validateProjectForm } from "@/lib/formValidation";
 import type { Project } from "@/types";
 
 const CATEGORIES = ["Architecture", "Civil Engineering", "Project Management", "Masterplanning", "Interior"] as const;
-const STATUSES = ["Completed", "Ongoing"] as const;
+const STATUSES = ["Completed", "Ongoing", "Handed Over", "Consulted"] as const;
 
 const emptyForm = { title: "", category: "Architecture" as Project["category"], status: "Ongoing" as Project["status"], description: "", imageUrl: "", location: "", client: "", completionYear: "" };
 
@@ -40,8 +40,7 @@ export default function AdminProjectsPage() {
   const fetchProjects = useCallback(async () => {
     setLoading(true);
     const params: Record<string, string | number> = { page, limit, search };
-    if (activeTab === "Ongoing (ongoing)") params.status = "Ongoing";
-    if (activeTab === "Completed (completed)") params.status = "Completed";
+    if (activeTab !== "All Projects") params.status = activeTab;
     const res = await getProjects(params).catch(() => null);
     if (res) {
       setProjects(res.data?.data ?? []);
@@ -122,7 +121,7 @@ export default function AdminProjectsPage() {
     setDeleting(false);
   }
 
-  const tabs = [`All Projects (${total})`, "Ongoing", "Completed"];
+  const tabs = ["All Projects", "Ongoing", "Completed", "Handed Over", "Consulted"];
 
   const columns: ColumnDef<Project>[] = [
     {
@@ -153,7 +152,16 @@ export default function AdminProjectsPage() {
       key: "status",
       header: "STATUS",
       cell: (item) => (
-        <Badge variant={item.status === "Completed" ? "default" : "secondary"} className={cn("text-[10px] px-2 py-1 tracking-widest uppercase font-bold", item.status === "Completed" ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700")}>
+        <Badge
+          variant="secondary"
+          className={cn(
+            "text-[10px] px-2 py-1 tracking-widest uppercase font-bold",
+            item.status === "Completed" && "bg-green-100 text-green-700",
+            item.status === "Ongoing" && "bg-orange-100 text-orange-700",
+            item.status === "Handed Over" && "bg-blue-100 text-blue-700",
+            item.status === "Consulted" && "bg-purple-100 text-purple-700"
+          )}
+        >
           {item.status}
         </Badge>
       ),

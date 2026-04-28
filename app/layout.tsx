@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const branding = await getServerBrandingSettings();
 
   return {
-    title: "NEEZA Designs | African Architecture & Engineering",
+    title: "NEEZA | African Architecture & Engineering",
     description: "Crafting the Future of African Architecture. East Africa's premier architecture and engineering consultancy.",
     icons: {
       icon: branding.favicon,

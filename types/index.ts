@@ -5,7 +5,7 @@ export interface AuthUser {
 }
 
 export type ProjectCategory = "Architecture" | "Civil Engineering" | "Project Management" | "Masterplanning" | "Interior";
-export type ProjectStatus = "Completed" | "Ongoing";
+export type ProjectStatus = "Completed" | "Ongoing" | "Handed Over" | "Consulted";
 
 export interface Project {
   _id: string;
@@ -60,4 +60,61 @@ export interface Service {
   imageUrl: string;
   icon?: string;
   buttonTitle?: string;
+}
+
+export type CareerEmploymentType = "Full-time" | "Part-time" | "Contract" | "Internship";
+export type CareerLevel = "Entry" | "Mid" | "Senior" | "Lead";
+export type CareerStatus = "Open" | "Closed";
+
+export interface Career {
+  _id: string;
+  slug: string;
+  title: string;
+  department: string;
+  location: string;
+  employmentType: CareerEmploymentType;
+  experienceLevel: CareerLevel;
+  description: string;
+  requirements: string[];
+  responsibilities: string[];
+  applyEmail?: string;
+  applyUrl?: string;
+  deadline?: string;
+  status: CareerStatus;
+  featured: boolean;
+  createdAt?: string;
+}
+
+export type PublicationType = "Report" | "Portfolio" | "Law" | "Policy" | "Guide" | "Other";
+export interface Publication {
+  _id: string;
+  slug: string;
+  title: string;
+  summary: string;
+  type: PublicationType;
+  publishedAt: string;
+  coverImage?: string;
+  fileUrl?: string;
+  externalUrl?: string;
+  tags: string[];
+  createdAt?: string;
+}
+
+export type ApplicationStatus = "New" | "Reviewing" | "Shortlisted" | "Rejected" | "Hired";
+
+export interface JobApplication {
+  _id: string;
+  careerId: string;
+  careerSlug: string;
+  careerTitle: string;
+  applicantName: string;
+  email: string;
+  phone?: string;
+  linkedIn?: string;
+  resumeUrl?: string;
+  coverLetter?: string;
+  status: ApplicationStatus;
+  notes: string[];
+  appliedAt: string;
+  createdAt?: string;
 }

@@ -12,10 +12,12 @@ import { useBranding } from "@/components/layout/BrandingProvider";
 
 const navLinks = [
   { name: "Home", href: "/" },
+  { name: "About Us", href: "/about" },
   { name: "Services", href: "/services" },
   { name: "Projects", href: "/projects" },
+  { name: "Publications", href: "/publications" },
+  { name: "Careers", href: "/careers" },
   { name: "Blog", href: "/blog" },
-  { name: "About Us", href: "/about" },
   { name: "Contact", href: "/contact" },
 ];
 
@@ -47,8 +49,8 @@ export function Navbar() {
           {/* Logo placeholder - replace with actual SVG later */}
           <div className="flex flex-col">
            <Image 
-             src={isSolid ? branding.logoLight : branding.logoDark}
-             alt="NEEZA Designs Logo" 
+             src={branding.logoLight}
+             alt="NEEZA Logo" 
              width={100} 
              height={100} 
            />
@@ -62,7 +64,7 @@ export function Navbar() {
               key={link.name}
               href={link.href}
               className={cn(
-                "text-sm font-medium transition-colors relative",
+                "text-base lg:text-lg font-medium transition-colors relative",
                 pathname === link.href
                   ? (isSolid ? "text-primary" : "text-accent")
                   : (isSolid ? "text-neutral-700" : "text-white hover:text-accent")
@@ -88,7 +90,7 @@ export function Navbar() {
                 !isSolid && "text-white border-white hover:bg-white hover:text-neutral-900"
               )}
             >
-              Start a Project
+              Send Inquiry
             </Button>
           </Link>
         </div>
@@ -125,7 +127,7 @@ export function Navbar() {
             </Link>
           ))}
           <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
-            <Button className="w-full mt-4">Start a Project</Button>
+            <Button className="w-full mt-4">Send Inquiry</Button>
           </Link>
         </div>
       )}
