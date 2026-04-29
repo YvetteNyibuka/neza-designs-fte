@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useBranding } from "@/components/layout/BrandingProvider";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, 
@@ -25,21 +27,27 @@ const sidebarLinks = [
   { name: "Inquiries", href: "/admin/inquiries", icon: Mail },
   { name: "Careers", href: "/admin/careers", icon: Briefcase },
   { name: "Publications", href: "/admin/publications", icon: BookOpen },
+  { name: "Newsletter", href: "/admin/newsletter", icon: Mail },
   // { name: "Media Library", href: "/admin/media", icon: ImageIcon },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const { branding } = useBranding();
 
   return (
     <aside className="w-64 bg-neutral-50/50 border-r border-neutral-200 flex flex-col h-screen fixed top-0 left-0">
       {/* Brand */}
       <div className="h-24 flex items-center justify-center border-b border-neutral-200">
-        <Link href="/admin" className="flex items-center">
-          <span className="font-heading font-bold text-2xl tracking-tighter leading-none text-primary">
-            NEEZA
-          </span>
+        <Link href="/" className="flex items-center" title="Go to admin dashboard">
+          <Image
+            src={branding.logoLight}
+            alt="NEEZA"
+            width={160}
+            height={64}
+            className="h-14 w-auto "
+          />
         </Link>
       </div>
 

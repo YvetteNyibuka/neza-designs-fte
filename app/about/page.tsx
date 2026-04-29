@@ -67,17 +67,21 @@ export default function AboutPage() {
       <section className="py-24">
         <div className="container mx-auto px-4 md:px-8 max-w-5xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="p-10 bg-neutral-50 rounded-2xl border border-neutral-100">
-              <Compass className="w-8 h-8 text-primary mb-6" />
-              <h3 className="font-heading text-2xl font-bold text-neutral-900 mb-4">Our Vision</h3>
-              <p className="text-neutral-600 leading-relaxed">
+            <div className="group relative overflow-hidden p-10 bg-linear-to-br from-neutral-50 to-white rounded-2xl border border-neutral-200 shadow-sm transition-all duration-400 hover:-translate-y-2 hover:shadow-2xl hover:border-primary/40">
+              <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-primary via-[#DAA119] to-transparent" />
+              <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary/10 blur-2xl transition-transform duration-500 group-hover:scale-125" />
+              <Compass className="relative z-10 w-8 h-8 text-primary mb-6 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110" />
+              <h3 className="relative z-10 font-heading text-2xl font-bold text-neutral-900 mb-4 transition-colors duration-300 group-hover:text-primary">Our Vision</h3>
+              <p className="relative z-10 text-neutral-600 leading-relaxed transition-colors duration-300 group-hover:text-neutral-800">
                 To be the vanguard of African architectural innovation, creating sustainable, luxurious environments that stand the test of time and redefine the skyline of the continent.
               </p>
             </div>
-            <div className="p-10 bg-neutral-50 rounded-2xl border border-neutral-100">
-              <Network className="w-8 h-8 text-primary mb-6" />
-              <h3 className="font-heading text-2xl font-bold text-neutral-900 mb-4">Our Mission</h3>
-              <p className="text-neutral-600 leading-relaxed">
+            <div className="group relative overflow-hidden p-10 bg-linear-to-tr from-neutral-50 to-white rounded-2xl border border-neutral-200 shadow-sm transition-all duration-400 hover:-translate-y-2 hover:shadow-2xl hover:border-primary/40">
+              <div className="absolute inset-y-0 left-0 w-1 bg-linear-to-b from-primary via-[#DAA119] to-transparent" />
+              <div className="absolute -left-12 -bottom-16 h-36 w-36 rounded-full bg-[#DAA119]/10 blur-2xl transition-transform duration-500 group-hover:scale-125" />
+              <Network className="relative z-10 w-8 h-8 text-primary mb-6 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110" />
+              <h3 className="relative z-10 font-heading text-2xl font-bold text-neutral-900 mb-4 transition-colors duration-300 group-hover:text-primary">Our Mission</h3>
+              <p className="relative z-10 text-neutral-600 leading-relaxed transition-colors duration-300 group-hover:text-neutral-800">
                 Delivering integrated, world-class consultancy services that transform client aspirations into tangible landmarks through rigorous engineering precision and creative excellence.
               </p>
             </div>
@@ -100,11 +104,11 @@ export default function AboutPage() {
               { title: "Sustainability", icon: Leaf, text: "Eco-conscious building practices that respect our environment." },
               { title: "Cultural Resonance", icon: Users, text: "Designs that honor and reflect our rich Rwandan heritage." },
             ].map((value, idx) => (
-              <Card key={idx} className="border-0 shadow-sm">
+              <Card key={idx} className="group border border-neutral-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-primary/30">
                 <CardContent className="p-8">
-                  <value.icon className="w-6 h-6 text-primary mb-6" />
-                  <h3 className="font-heading text-xl font-bold text-neutral-900 mb-3">{value.title}</h3>
-                  <p className="text-sm text-neutral-500 leading-relaxed">{value.text}</p>
+                  <value.icon className="w-6 h-6 text-primary mb-6 transition-transform duration-300 group-hover:scale-110" />
+                  <h3 className="font-heading text-xl font-bold text-neutral-900 mb-3 transition-colors duration-300 group-hover:text-primary">{value.title}</h3>
+                  <p className="text-sm text-neutral-500 leading-relaxed transition-colors duration-300 group-hover:text-neutral-700">{value.text}</p>
                 </CardContent>
               </Card>
             ))}
@@ -119,7 +123,7 @@ export default function AboutPage() {
         <div className="container mx-auto px-4 md:px-8 max-w-7xl">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-center">
             <div className="lg:col-span-1">
-              <h2 className="font-heading text-3xl md:text-4xl font-bold mb-6">The NEEZA Model</h2>
+              <h2 className="font-heading text-primary text-3xl md:text-4xl font-bold mb-6">The NEEZA Model</h2>
               <p className="text-neutral-400 leading-relaxed mb-8">
                 Our methodology is built on four strategic cornerstones that ensure every project is delivered with precision, creativity, and longevity. We don't just build, we orchestrate spaces.
               </p>

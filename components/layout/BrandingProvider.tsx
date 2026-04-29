@@ -13,6 +13,8 @@ interface BrandingContextValue {
   branding: BrandingConfig;
 }
 
+type BrandingUpdatedEvent = CustomEvent<unknown>;
+
 const BrandingContext = createContext<BrandingContextValue>({
   branding: DEFAULT_BRANDING,
 });
@@ -79,6 +81,20 @@ export function BrandingProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    function handleBrandingUpdated(event: Event) {
+      const custom = event as BrandingUpdatedEvent;
+      const resolved = mergeBrandingSettings(custom.detail);
+      setBranding(resolved);
+      applyBrandingToRoot(resolved);
+    }
+
+    window.addEventListener("branding-updated", handleBrandingUpdated as EventListener);
+    return () => {
+      window.removeEventListener("branding-updated", handleBrandingUpdated as EventListener);
     };
   }, []);
 

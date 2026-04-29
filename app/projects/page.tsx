@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Image from "next/image";
 import { getProjects } from "@/lib/api/projects";
 import { Badge } from "@/components/ui/Badge";
@@ -11,10 +11,9 @@ import type { Project } from "@/types";
 const categoryFilters = [
   { label: "All Categories" },
   { label: "Architecture" },
-  { label: "Civil Engineering" },
+  { label: "Construction" },
   { label: "Project Management" },
-  { label: "Masterplanning" },
-  { label: "Interior" },
+  { label: "Land Acquisition" },
 ];
 
 const statusFilters = [
@@ -25,22 +24,25 @@ const statusFilters = [
   { label: "Consulted" },
 ];
 
-export default function ProjectsPage() {
+function ProjectsPageContent() {
   const searchParams = useSearchParams();
-  const [activeCategory, setActiveCategory] = useState(() => {
-    const incomingCategory = searchParams.get("category");
-    return incomingCategory && categoryFilters.some((c) => c.label === incomingCategory)
-      ? incomingCategory
-      : "All Categories";
-  });
-  const [activeStatus, setActiveStatus] = useState(() => {
-    const incomingStatus = searchParams.get("status");
-    return incomingStatus && statusFilters.some((s) => s.label === incomingStatus)
-      ? incomingStatus
-      : "All Statuses";
-  });
+  const [activeCategory, setActiveCategory] = useState("All Categories");
+  const [activeStatus, setActiveStatus] = useState("All Statuses");
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Read searchParams on client only to avoid hydration mismatch
+  useEffect(() => {
+    const incomingCategory = searchParams.get("category");
+    const incomingStatus = searchParams.get("status");
+    if (incomingCategory && categoryFilters.some((c) => c.label === incomingCategory)) {
+      setActiveCategory(incomingCategory);
+    }
+    if (incomingStatus && statusFilters.some((s) => s.label === incomingStatus)) {
+      setActiveStatus(incomingStatus);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const params: Record<string, string> = {};
@@ -133,6 +135,14 @@ export default function ProjectsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ProjectsPage() {
+  return (
+    <Suspense fallback={<div className="flex flex-1 items-center justify-center py-24 text-sm text-neutral-400">Loading projects…</div>}>
+      <ProjectsPageContent />
+    </Suspense>
   );
 }
 

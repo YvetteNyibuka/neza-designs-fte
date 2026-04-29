@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { createPublication, deletePublication, getPublications, updatePublication } from "@/lib/api/publications";
-import { ImageUpload } from "@/components/ui/ImageUpload";
 import { toast } from "sonner";
 import { toastApiErrors, parseApiFieldErrors } from "@/lib/apiErrorToast";
 import type { Publication } from "@/types";
@@ -15,20 +14,14 @@ type PublicationForm = {
   title: string;
   summary: string;
   type: Publication["type"];
-  fileUrl: string;
-  externalUrl: string;
-  coverImage: string;
-  tags: string;
+  documentUrl: string;
 };
 
 const emptyForm: PublicationForm = {
   title: "",
   summary: "",
   type: "Report",
-  fileUrl: "",
-  externalUrl: "",
-  coverImage: "",
-  tags: "",
+  documentUrl: "",
 };
 
 export default function AdminPublicationsPage() {
@@ -67,10 +60,7 @@ export default function AdminPublicationsPage() {
       title: item.title,
       summary: item.summary,
       type: item.type,
-      fileUrl: item.fileUrl ?? "",
-      externalUrl: item.externalUrl ?? "",
-      coverImage: item.coverImage ?? "",
-      tags: item.tags.join(", "),
+      documentUrl: item.fileUrl ?? item.externalUrl ?? "",
     });
     setFieldErrors({});
     setModalOpen(true);
@@ -82,15 +72,16 @@ export default function AdminPublicationsPage() {
       return;
     }
 
+    const url = form.documentUrl.trim();
+    const isLikelyFile = /\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip|rar|7z)(\?.*)?$/i.test(url);
+
     const payload = {
       title: form.title.trim(),
       summary: form.summary.trim(),
       type: form.type,
-      fileUrl: form.fileUrl.trim() || undefined,
-      externalUrl: form.externalUrl.trim() || undefined,
-      coverImage: form.coverImage.trim() || undefined,
-      tags: form.tags.split(",").map((v) => v.trim()).filter(Boolean),
-      publishedAt: new Date().toISOString(),
+      fileUrl: url ? (isLikelyFile ? url : undefined) : undefined,
+      externalUrl: url ? (isLikelyFile ? undefined : url) : undefined,
+      ...(editing ? {} : { publishedAt: new Date().toISOString() }),
     };
 
     try {
@@ -131,6 +122,7 @@ export default function AdminPublicationsPage() {
                 <h3 className="font-semibold text-lg text-neutral-900">{item.title}</h3>
                 <p className="text-sm text-neutral-500">{item.type}</p>
                 <p className="text-sm text-neutral-600 mt-2 line-clamp-2">{item.summary}</p>
+                <p className="text-xs text-neutral-400 mt-2 truncate">{item.fileUrl ?? item.externalUrl ?? "No document URL"}</p>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => openEdit(item)}>Edit</Button>
@@ -141,7 +133,7 @@ export default function AdminPublicationsPage() {
         </div>
       </div>
 
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editing ? "Edit Publication" : "New Publication"}>
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editing ? "Edit Publication" : "New Publication" } maxWidth="2xl">
         <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
           <div>
             <Input label="Title" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: (e.target as HTMLInputElement).value }))} />
@@ -161,10 +153,7 @@ export default function AdminPublicationsPage() {
             </select>
           </div>
 
-          <ImageUpload label="Cover Image" folder="publications" value={form.coverImage} onChange={(url) => setForm((f) => ({ ...f, coverImage: url }))} />
-          <Input label="File URL" value={form.fileUrl} onChange={(e) => setForm((f) => ({ ...f, fileUrl: (e.target as HTMLInputElement).value }))} />
-          <Input label="External URL" value={form.externalUrl} onChange={(e) => setForm((f) => ({ ...f, externalUrl: (e.target as HTMLInputElement).value }))} />
-          <Input label="Tags (comma separated)" value={form.tags} onChange={(e) => setForm((f) => ({ ...f, tags: (e.target as HTMLInputElement).value }))} />
+          <Input label="Document URL" value={form.documentUrl} onChange={(e) => setForm((f) => ({ ...f, documentUrl: (e.target as HTMLInputElement).value }))} />
 
           <div className="flex gap-3 pt-2">
             <Button variant="outline" className="flex-1" onClick={() => setModalOpen(false)}>Cancel</Button>

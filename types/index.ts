@@ -4,7 +4,7 @@ export interface AuthUser {
   role: string;
 }
 
-export type ProjectCategory = "Architecture" | "Civil Engineering" | "Project Management" | "Masterplanning" | "Interior";
+export type ProjectCategory = "Architecture" | "Construction" | "Project Management" | "Land Acquisition";
 export type ProjectStatus = "Completed" | "Ongoing" | "Handed Over" | "Consulted";
 
 export interface Project {
@@ -55,7 +55,6 @@ export interface Service {
   id?: string;
   title: string;
   shortDescription: string;
-  fullDescription: string;
   features: string[] | { name: string; meaning?: string; icon?: string }[];
   imageUrl: string;
   icon?: string;
@@ -77,8 +76,6 @@ export interface Career {
   description: string;
   requirements: string[];
   responsibilities: string[];
-  applyEmail?: string;
-  applyUrl?: string;
   deadline?: string;
   status: CareerStatus;
   featured: boolean;
@@ -95,6 +92,7 @@ export interface Publication {
   publishedAt: string;
   coverImage?: string;
   fileUrl?: string;
+  fileSize?: string;
   externalUrl?: string;
   tags: string[];
   createdAt?: string;

@@ -1,9 +1,16 @@
 import api from "@/lib/axios";
 import type { Service } from "@/types";
+import { dummyServices } from "@/lib/data";
 
 export async function getServices() {
-  const { data } = await api.get("/services");
-  return data;
+  try {
+    const { data } = await api.get("/services");
+    const list: Service[] = data?.data ?? data ?? [];
+    if (list.length > 0) return { data: list };
+    return { data: dummyServices };
+  } catch {
+    return { data: dummyServices };
+  }
 }
 
 export async function getService(id: string) {

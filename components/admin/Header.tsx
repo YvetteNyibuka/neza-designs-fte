@@ -1,8 +1,11 @@
 "use client";
 
+import Link from "next/link";
+import Image from "next/image";
 import { Bell, HelpCircle, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { useBranding } from "@/components/layout/BrandingProvider";
 
 interface AdminHeaderProps {
   title?: string;
@@ -12,6 +15,7 @@ interface AdminHeaderProps {
 export function AdminHeader({ title, actions }: AdminHeaderProps) {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const { branding } = useBranding();
 
   async function handleLogout() {
     await logout();
@@ -23,16 +27,28 @@ export function AdminHeader({ title, actions }: AdminHeaderProps) {
     : "AD";
 
   return (
-    <header className="h-24 px-8 border-b border-neutral-200 bg-neutral-50/20 flex items-center justify-between sticky top-0 z-10 backdrop-blur-md">
-      <div>
-        {title ? (
-          <h1 className="font-heading text-2xl font-bold text-neutral-900">{title}</h1>
-        ) : (
-          <div>
-            <h1 className="font-heading text-3xl font-bold text-neutral-900 mb-1">Dashboard Overview</h1>
-            <p className="text-sm text-neutral-500 font-medium">Welcome back. Here&apos;s what&apos;s happening today.</p>
-          </div>
-        )}
+    <header className="h-24 px-8 border-b border-neutral-200 bg-[#FDFCFB] flex items-center justify-between sticky top-0 z-20">
+      <div className="flex items-center gap-6">
+        {/* <Link href="/" title="Go to website" className="shrink-0">
+          <Image
+            src={branding.logoLight}
+            alt="NEEZA"
+            width={100}
+            height={40}
+            className="h-9 w-auto"
+          />
+        </Link> */}
+        {/* <div className="w-px h-8 bg-neutral-200" /> */}
+        <div>
+          {title ? (
+            <h1 className="font-heading text-2xl font-bold text-neutral-900">{title}</h1>
+          ) : (
+            <div>
+              <h1 className="font-heading text-3xl font-bold text-neutral-900 mb-1">Dashboard Overview</h1>
+              <p className="text-sm text-neutral-500 font-medium">Welcome back. Here&apos;s what&apos;s happening today.</p>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-6">

@@ -8,13 +8,12 @@ const BLOG_CATEGORIES = [
 
 const PROJECT_CATEGORIES = [
   "Architecture",
-  "Civil Engineering",
+  "Construction",
   "Project Management",
-  "Masterplanning",
-  "Interior",
+  "Land Acquisition",
 ] as const;
 
-const PROJECT_STATUSES = ["Completed", "Ongoing"] as const;
+const PROJECT_STATUSES = ["Completed", "Ongoing", "Handed Over", "Consulted"] as const;
 
 const HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/;
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
@@ -87,22 +86,18 @@ export function validateProjectForm(form: {
 export function validateServiceForm(form: {
   title: string;
   shortDescription: string;
-  fullDescription: string;
   imageUrl?: string;
   features: ServiceFeatureInput[];
 }): string[] {
   const errors: string[] = [];
   const title = form.title.trim();
   const shortDescription = form.shortDescription.trim();
-  const fullDescription = form.fullDescription.trim();
 
   if (title.length < 2) errors.push("title: Must be at least 2 characters");
   if (title.length > 200) errors.push("title: Must be at most 200 characters");
 
   if (shortDescription.length < 10) errors.push("shortDescription: Must be at least 10 characters");
   if (shortDescription.length > 300) errors.push("shortDescription: Must be at most 300 characters");
-
-  if (fullDescription.length < 20) errors.push("fullDescription: Must be at least 20 characters");
 
   if (form.imageUrl && !isValidUrl(form.imageUrl)) {
     errors.push("imageUrl: Must be a valid URL");

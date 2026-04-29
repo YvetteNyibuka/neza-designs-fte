@@ -126,9 +126,7 @@ export default function BlogPostPage({
             <span className="text-white/80">{post.category}</span>
           </nav>
 
-          <Badge className="bg-primary/20 text-primary border border-primary/40 backdrop-blur-sm text-[0.6rem] tracking-[0.15em] uppercase px-3 py-1 mb-5">
-            {post.category}
-          </Badge>
+        
 
           <h1 className="font-heading text-3xl md:text-5xl lg:text-[3.25rem] font-bold text-white leading-tight mb-8 max-w-4xl">
             {post.title}

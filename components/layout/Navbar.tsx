@@ -29,11 +29,12 @@ export function Navbar() {
 
   if (pathname?.startsWith("/admin")) return null;
 
-  // Some pages might not have a hero image, so we might want the navbar to always be solid.
-  // For simplicity, we assume solid on scroll or if not on root, but let's base it purely on scroll for the hero effect
-  // and maybe check if we are on a page that needs solid background.
-  // All public pages now have hero sections, so we only need solid on scroll.
-  const isSolid = isScrolled;
+  // Keep hero behavior by default and force solid only on legal/contact pages.
+  const solidOnlyRoutes = ["/privacy", "/terms", "/contact"];
+  const forceSolid = pathname
+    ? solidOnlyRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`))
+    : false;
+  const isSolid = forceSolid || isScrolled;
 
   return (
     <header

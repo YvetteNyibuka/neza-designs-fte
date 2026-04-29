@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
-import { Edit, Leaf, MonitorSmartphone, CheckCircle, Trash2, Plus } from "lucide-react";
+import { Edit, Trash2, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getProjects, createProject, updateProject, deleteProject } from "@/lib/api/projects";
 import { ImageUpload } from "@/components/ui/ImageUpload";
@@ -16,7 +16,7 @@ import { toastApiErrors, toastValidationErrors } from "@/lib/apiErrorToast";
 import { validateProjectForm } from "@/lib/formValidation";
 import type { Project } from "@/types";
 
-const CATEGORIES = ["Architecture", "Civil Engineering", "Project Management", "Masterplanning", "Interior"] as const;
+const CATEGORIES = ["Architecture", "Construction", "Project Management", "Land Acquisition"] as const;
 const STATUSES = ["Completed", "Ongoing", "Handed Over", "Consulted"] as const;
 
 const emptyForm = { title: "", category: "Architecture" as Project["category"], status: "Ongoing" as Project["status"], description: "", imageUrl: "", location: "", client: "", completionYear: "" };
@@ -209,50 +209,24 @@ export default function AdminProjectsPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-neutral-200 shadow-sm overflow-hidden mb-12">
-          {loading ? (
-            <div className="p-12 text-center text-neutral-400 text-sm">Loading…</div>
-          ) : (
-            <Table data={projects} columns={columns} className="w-full text-sm" />
-          )}
-          <div className="p-6 pt-0 border-t border-neutral-100 flex items-center justify-between">
-            <span className="text-xs text-neutral-500">Showing <strong className="text-neutral-900">{projects.length}</strong> of <strong className="text-neutral-900">{total}</strong> projects</span>
-            <div className="flex gap-2">
-              <button disabled={page === 1} onClick={() => setPage((p) => p - 1)} className="w-8 h-8 flex items-center justify-center border border-neutral-200 rounded-md text-neutral-400 hover:bg-neutral-50 disabled:opacity-40">&lt;</button>
-              <button disabled={page * limit >= total} onClick={() => setPage((p) => p + 1)} className="w-8 h-8 flex items-center justify-center border border-neutral-200 rounded-md text-neutral-400 hover:bg-neutral-50 disabled:opacity-40">&gt;</button>
-            </div>
-          </div>
-        </div>
+        <Table
+            data={projects}
+            columns={columns}
+            className="w-full text-sm mb-12"
+            loading={loading}
+            pagination={{
+              currentPage: page,
+              totalPages: Math.ceil(total / limit) || 1,
+              totalItems: total,
+              pageSize: limit,
+              onPageChange: (p) => setPage(p),
+            }}
+          />
 
-        {/* Strategic Initiatives */}
-        <div>
-          <h2 className="font-heading font-bold text-2xl text-neutral-900 mb-6">Strategic Initiatives</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-[#F9F6F0] p-8 rounded-xl border border-[#EBE3D5] group hover:-translate-y-1 transition-transform cursor-pointer relative overflow-hidden">
-              <div className="w-10 h-10 rounded-full border border-primary/20 text-primary flex items-center justify-center mb-6 bg-white"><Leaf className="w-5 h-5" /></div>
-              <h3 className="font-heading font-bold text-lg text-neutral-900 mb-3">Sustainable Infrastructure</h3>
-              <p className="text-sm text-neutral-500 mb-8 leading-relaxed">Focusing on net-zero engineering for upcoming residential projects.</p>
-              <div className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">VIEW ROADMAP &rarr;</div>
-            </div>
-            <div className="bg-[#F4F4F4] p-8 rounded-xl border border-neutral-200 group hover:-translate-y-1 transition-transform cursor-pointer relative overflow-hidden">
-              <div className="w-10 h-10 rounded-full text-primary flex items-center justify-center mb-6 bg-white"><MonitorSmartphone className="w-5 h-5" /></div>
-              <h3 className="font-heading font-bold text-lg text-neutral-900 mb-3">Smart City Integration</h3>
-              <p className="text-sm text-neutral-500 mb-8 leading-relaxed">Implementing IoT-based traffic and power management in downtown commercial designs.</p>
-              <div className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">EXPLORE TECH &rarr;</div>
-            </div>
-            <div className="bg-primary text-white p-8 rounded-xl border border-primary-dark group relative overflow-hidden shadow-lg cursor-pointer hover:-translate-y-1 transition-transform">
-              <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/5 rounded-full blur-2xl"></div>
-              <div className="w-10 h-10 rounded-full text-white flex items-center justify-center mb-6 bg-white/10"><CheckCircle className="w-5 h-5" /></div>
-              <h3 className="font-heading font-bold text-lg text-white mb-3">Quick Report</h3>
-              <p className="text-sm text-white/80 mb-8 leading-relaxed">Generate an instant status report for all ongoing high-priority projects.</p>
-              <div className="text-xs font-bold uppercase tracking-widest text-white flex items-center gap-2">GENERATE NOW &rarr;</div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Create / Edit Modal */}
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editing ? "Edit Project" : "New Project"}>
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editing ? "Edit Project" : "New Project"} maxWidth="2xl">
         <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
           <Input label="Title" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: (e.target as HTMLInputElement).value }))} />
           <div>
