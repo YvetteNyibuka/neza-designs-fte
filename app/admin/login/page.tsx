@@ -97,14 +97,14 @@ export default function AdminLoginPage() {
       <div className="hidden lg:flex lg:w-1/2 relative bg-neutral-900 flex-col items-center justify-center overflow-hidden">
         <Image
           src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
-          alt="Neza Designs"
+          alt="NEEZA"
           fill
           style={{ objectFit: "cover" }}
           priority
         />
         <div className="absolute inset-0 bg-neutral-900/70" />
         <div className="relative z-10 text-center px-12">
-          <h1 className="font-heading text-5xl font-bold text-white mb-4">Neza Designs</h1>
+          <h1 className="font-heading text-5xl font-bold text-white mb-4">NEEZA</h1>
           <p className="text-white/70 text-lg font-light max-w-md">
             Building sustainable futures through architecture, engineering, and design excellence.
           </p>
@@ -143,7 +143,7 @@ export default function AdminLoginPage() {
               <Input
                 label="Email address"
                 type="email"
-                placeholder="admin@nezadesigns.com"
+                placeholder="admin@neeza.rw"
                 value={email}
                 onChange={(e) => setEmail((e.target as HTMLInputElement).value)}
                 required

@@ -13,6 +13,7 @@ export interface ColumnDef<T> {
 export interface TableProps<T> extends React.HTMLAttributes<HTMLDivElement> {
   data: T[];
   columns: ColumnDef<T>[];
+  loading?: boolean;
   searchable?: boolean;
   searchPlaceholder?: string;
   onSearch?: (term: string) => void;
@@ -24,14 +25,29 @@ export interface TableProps<T> extends React.HTMLAttributes<HTMLDivElement> {
   pagination?: {
     currentPage: number;
     totalPages: number;
+    totalItems?: number;
+    pageSize?: number;
     onPageChange: (page: number) => void;
   };
   emptyMessage?: string;
 }
 
+function getPageNumbers(current: number, total: number): (number | "...")[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages: (number | "...")[] = [1];
+  if (current > 3) pages.push("...");
+  for (let p = Math.max(2, current - 1); p <= Math.min(total - 1, current + 1); p++) {
+    pages.push(p);
+  }
+  if (current < total - 2) pages.push("...");
+  pages.push(total);
+  return pages;
+}
+
 export function Table<T extends Record<string, any>>({
   data,
   columns,
+  loading = false,
   searchable,
   searchPlaceholder = "Search...",
   onSearch,
@@ -93,7 +109,13 @@ export function Table<T extends Record<string, any>>({
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
-              {data.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={columns.length} className="px-6 py-12 text-center text-neutral-500">
+                    Loading...
+                  </td>
+                </tr>
+              ) : data.length === 0 ? (
                 <tr>
                   <td colSpan={columns.length} className="px-6 py-12 text-center text-neutral-500">
                     {emptyMessage}
@@ -115,12 +137,24 @@ export function Table<T extends Record<string, any>>({
         </div>
 
         {/* Pagination Footer */}
-        {pagination && pagination.totalPages > 1 && (
+        {pagination && (pagination.totalItems ?? 0) > 0 && (
           <div className="flex items-center justify-between px-6 py-4 border-t border-neutral-200 bg-neutral-50/50">
             <span className="text-xs text-neutral-500">
-              Page {pagination.currentPage} of {pagination.totalPages}
+              {pagination.totalItems != null && pagination.pageSize != null ? (
+                <>
+                  Showing{" "}
+                  <strong className="text-neutral-900">
+                    {Math.min((pagination.currentPage - 1) * pagination.pageSize + 1, pagination.totalItems)}
+                    –
+                    {Math.min(pagination.currentPage * pagination.pageSize, pagination.totalItems)}
+                  </strong>{" "}
+                  of <strong className="text-neutral-900">{pagination.totalItems}</strong>
+                </>
+              ) : (
+                <>Page <strong className="text-neutral-900">{pagination.currentPage}</strong> of <strong className="text-neutral-900">{pagination.totalPages}</strong></>
+              )}
             </span>
-            <div className="flex gap-1">
+            <div className="flex gap-1 items-center">
               <button
                 onClick={() => pagination.onPageChange(pagination.currentPage - 1)}
                 disabled={pagination.currentPage <= 1}
@@ -128,6 +162,24 @@ export function Table<T extends Record<string, any>>({
               >
                 Previous
               </button>
+              {getPageNumbers(pagination.currentPage, pagination.totalPages).map((p, i) =>
+                p === "..." ? (
+                  <span key={`ellipsis-${i}`} className="px-1 py-1.5 text-xs text-neutral-400">…</span>
+                ) : (
+                  <button
+                    key={p}
+                    onClick={() => pagination.onPageChange(p as number)}
+                    className={cn(
+                      "w-8 h-8 text-xs font-medium rounded border transition-colors",
+                      pagination.currentPage === p
+                        ? "bg-primary border-primary text-white"
+                        : "border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50"
+                    )}
+                  >
+                    {p}
+                  </button>
+                )
+              )}
               <button
                 onClick={() => pagination.onPageChange(pagination.currentPage + 1)}
                 disabled={pagination.currentPage >= pagination.totalPages}

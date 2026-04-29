@@ -496,7 +496,7 @@ function SecurityTab() {
 
 /* ─── SEO TAB ────────────────────────────────────────────────── */
 function SeoTab() {
-  const [metaTitle, setMetaTitle] = useState("NEEZA Designs | African Architecture & Engineering");
+  const [metaTitle, setMetaTitle] = useState("NEEZA | African Architecture & Engineering");
   const [metaDesc, setMetaDesc] = useState(
     "East Africa's premier architecture and engineering consultancy, crafting sustainable, luxury built environments rooted in African heritage."
   );
@@ -828,7 +828,19 @@ function BrandingTab() {
 
         setSaving(true); setSaveMsg(null);
         try {
-          await updateSettings({ primaryColor, secondaryColor, accentColor, logoLight: logoLight ?? undefined, logoDark: logoDark ?? undefined, favicon: favicon ?? undefined, font: selectedFont });
+          const payload = {
+            primaryColor,
+            secondaryColor,
+            accentColor,
+            logoLight: logoLight ?? undefined,
+            logoDark: logoDark ?? undefined,
+            favicon: favicon ?? undefined,
+            font: selectedFont,
+          };
+          await updateSettings(payload);
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("branding-updated", { detail: payload }));
+          }
           setSaveMsg("Branding settings saved.");
           toast.success("Branding settings saved");
         } catch (err: unknown) {

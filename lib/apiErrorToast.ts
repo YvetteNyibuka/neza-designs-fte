@@ -47,3 +47,13 @@ export function toastApiErrors(error: unknown, fallbackMessage: string): void {
 export function toastValidationErrors(errors: string[]): void {
   errors.forEach((err) => toast.error(err));
 }
+
+export function parseApiFieldErrors(error: unknown): Record<string, string> {
+  const response = (error as { response?: { data?: ApiErrorResponse } })?.response?.data;
+  if (!response || !Array.isArray(response.error)) return {};
+  return Object.fromEntries(
+    response.error
+      .filter((e): e is Required<ApiFieldError> => Boolean(e.field && e.message))
+      .map((e) => [e.field!, e.message!])
+  );
+}

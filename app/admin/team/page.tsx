@@ -160,7 +160,7 @@ export default function AdminTeamPage() {
         )}
       </div>
 
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editing ? "Edit Member" : "Add Team Member"}>
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editing ? "Edit Member" : "Add Team Member"} maxWidth="2xl"> 
         <div className="space-y-4">
           <Input label="Full Name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: (e.target as HTMLInputElement).value }))} />
           <Input label="Role / Title" value={form.role} onChange={(e) => setForm((f) => ({ ...f, role: (e.target as HTMLInputElement).value }))} />

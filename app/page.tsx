@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { getProjects } from "@/lib/api/projects";
-import { MoveRight, ShieldCheck, Zap, Leaf, ChevronLeft, ChevronRight } from "lucide-react";
+import { MoveRight, ShieldCheck, Zap, Leaf } from "lucide-react";
 import type { Project } from "@/types";
 
 export default function Home() {
@@ -39,23 +39,26 @@ export default function Home() {
 
         {/* Hero Content */}
         <div className="relative z-10 container mx-auto px-4 md:px-8 max-w-7xl flex flex-col items-center text-center mt-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#DAA119]/20 bg-[#DAA119]/30 px-3 py-1 text-xs font-semibold text-[#DAA119] tracking-widest uppercase mb-6 backdrop-blur-sm">
-            East Africa's Premier Consultancy
+          <div className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/30 px-3 py-1 text-xs font-semibold text-accent tracking-widest uppercase mb-6 backdrop-blur-sm">
+            From land to legacy
           </div>
           <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl font-bold text-white max-w-4xl tracking-tight leading-tight">
-            Designing Sustainable Communities <span className="text-[#DAA119]"> &amp; </span>  Cities of the Future
+            We shape land into enduring <span className="text-accent"> &amp; </span>  high-value developments.
           </h1>
           <p className="mt-6 text-lg md:text-xl text-neutral-200 max-w-2xl font-light">
-            Experience ultra-modern luxury and sustainable engineering with East Africa's premier consultancy firm.
-          </p>
+   We deliver integrated solutions in land, design, and construction with precision and excellence.          </p>
           
           <div className="mt-10 flex flex-col sm:flex-row gap-4">
-            <Button size="lg" className="w-full sm:w-auto h-14 px-8 text-base shadow-xl">
-              Start a Project
-            </Button>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto h-14 px-8 text-base text-white border-white hover:bg-white hover:text-neutral-900 backdrop-blur-sm">
-              View Portfolio <MoveRight className="ml-2 w-4 h-4" />
-            </Button>
+            <Link href="/contact?intent=start-project" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full sm:w-auto h-14 px-8 text-base shadow-xl">
+                Work with us <MoveRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
+            <Link href="/projects" className="w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto h-14 px-8 text-base text-white border-white hover:bg-white hover:text-neutral-900 backdrop-blur-sm">
+                Explore Projects <MoveRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -140,10 +143,10 @@ export default function Home() {
                 img: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2071&auto=format&fit=crop",
               },
               {
-                title: "Civil Engineering",
-                label: "CIVIL ENGINEERING",
+                title: "Construction",
+                label: "CONSTRUCTION",
                 icon: <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>,
-                desc: ["Structural Integrity, Infrastructure Systems and Environmental Engineering"],
+                desc: ["High-Quality Builds, Skilled Supervision and Safety Standards"],
                 img: "https://images.unsplash.com/photo-1590479773265-7464e5d48118?q=80&w=2070&auto=format&fit=crop",
               },
               {
@@ -176,7 +179,7 @@ export default function Home() {
                 {/* Default state: icon + title at bottom */}
                 <div className="absolute inset-0 flex flex-col justify-end p-8 transition-all duration-300 z-10">
                   {/* Icon */}
-                  <div className="text-white mb-4 group-hover:text-[#DAA119] transition-all duration-300 shrink-0">
+                  <div className="text-white mb-4 group-hover:text-accent transition-all duration-300 shrink-0">
                     {service.icon}
                   </div>
 
@@ -196,6 +199,7 @@ export default function Home() {
         </div>
       </section>
 
+
       {/* 
         Featured Projects
       */}
@@ -205,14 +209,9 @@ export default function Home() {
             <h2 className="font-heading text-3xl md:text-4xl font-bold text-neutral-900">
               Featured Projects
             </h2>
-            <div className="flex gap-2">
-              <button className="w-10 h-10 rounded-full border border-neutral-400 flex items-center justify-center text-neutral-500 hover:bg-primary hover:border-none hover:text-white transition-all duration-200">
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button className="w-10 h-10 rounded-full border border-neutral-400 flex items-center justify-center text-neutral-500 hover:bg-primary hover:border-none hover:text-white transition-all duration-200">
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
+            <Link href="/projects" className="text-primary font-medium hover:text-primary-dark transition-colors inline-flex items-center gap-2">
+              Browse all projects <MoveRight className="w-4 h-4" />
+            </Link>
           </div>
           <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
             {featuredProjects.map((project) => (
@@ -220,7 +219,7 @@ export default function Home() {
                 <Image src={project.imageUrl} alt={project.title} fill style={{ objectFit: "cover" }} className="group-hover:scale-105 transition-transform duration-100" />
                 <div className="absolute inset-0 bg-linear-to-t from-neutral-900/90 via-neutral-900/20 to-transparent" />
                 <div className="absolute bottom-8 left-8 right-8">
-                  <div className="text-[#DAA119] text-xs font-bold tracking-widest uppercase mb-2">
+                  <div className="text-accent text-xs font-bold tracking-widest uppercase mb-2">
                     {project.category}
                   </div>
                   <h3 className="text-white font-heading text-2xl font-bold mb-4">{project.title}</h3>
@@ -229,13 +228,55 @@ export default function Home() {
                       {project.description}
                     </p>
                   </div>
-                  <Link href={`/projects`} className="text-white text-sm font-medium transition-colors inline-block border-b border-[#DAA119] pb-1">
+                  <Link href={`/projects`} className="text-white text-sm font-medium transition-colors inline-block border-b border-accent pb-1">
                     View Case Study
                   </Link>
                 </div>
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Stakeholders / Partners */}
+      <section className="py-20 bg-neutral-50">
+        <div className="container mx-auto px-4 md:px-8 max-w-7xl">
+
+          {/* Header */}
+          <div className=" mb-14">
+            <h4 className="text-primary font-bold text-xs tracking-widest uppercase mb-4">Partners &amp; Stakeholders</h4>
+            <h2 className="font-heading text-3xl md:text-4xl font-bold text-neutral-900 leading-tight">
+              Built on <span className="text-primary italic">Trust</span>, Backed by the Best
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center justify-items-center">
+            {[
+              "Rwanda Housing Authority",
+              "Kigali City Council",
+              "Rwanda Development Board",
+              "Private Developers",
+              "Infrastructure Partners",
+              "Community Boards",
+              "Ministry of Infrastructure",
+              "East Africa Development Bank",
+            ].map((name) => (
+              <div key={name} className="opacity-80 hover:opacity-100 transition-opacity duration-300">
+                <Image
+                  src="/logos/BprimaryLogo.png"
+                  alt={name}
+                  width={120}
+                  height={120}
+                  className="object-contain w-24 h-24 md:w-28 md:h-28"
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Tagline */}
+          <p className="text-center text-neutral-500 text-sm leading-relaxed mt-10 max-w-lg mx-auto">
+            More than 15 institutions and private partners across East Africa trust NEEZA to deliver resilient, high-impact architectural and construction projects.
+          </p>
+
         </div>
       </section>
 
@@ -246,11 +287,13 @@ export default function Home() {
             Ready to Build the Extraordinary?
           </h2>
           <p className="text-white/80 text-lg mb-10 max-w-2xl mx-auto">
-            Whether it's a commercial landmark or a private sanctuary, let's bring your vision to life with precision and elegance.
+            Whether it&apos;s a commercial landmark or a private sanctuary, let&apos;s bring your vision to life with precision and elegance.
           </p>
-          <Button size="lg" className="bg-white text-primary hover:bg-neutral-100 h-14 px-8 text-base">
-            Schedule a Consultation
-          </Button>
+          <Link href="/contact?intent=consultation">
+            <Button size="lg" className="bg-white text-primary hover:bg-neutral-100 h-14 px-8 text-base">
+              Book a Consultation
+            </Button>
+          </Link>
         </div>
       </section>
     </div>

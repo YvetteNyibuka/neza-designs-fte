@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Mail, MapPin, Phone, Send } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { PhoneInput } from "@/components/ui/PhoneInput";
 import { submitContact } from "@/lib/api/contact";
 import { toastApiErrors, toastValidationErrors } from "@/lib/apiErrorToast";
 import { validateContactForm } from "@/lib/formValidation";
@@ -122,11 +123,10 @@ export default function ContactPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
+                <PhoneInput
                   label="Phone (optional)"
                   value={form.phone}
-                  onChange={(e) => setForm((prev) => ({ ...prev, phone: (e.target as HTMLInputElement).value }))}
-                  placeholder="+250..."
+                  onChange={(v) => setForm((prev) => ({ ...prev, phone: v }))}
                 />
                 <Input
                   label="Subject"

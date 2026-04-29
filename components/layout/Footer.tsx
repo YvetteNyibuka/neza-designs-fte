@@ -20,15 +20,15 @@ export function Footer() {
           <div className="space-y-6">
             <div className="flex items-center">
               <Image
-                src={branding.logoDark}
-                alt="NEEZA Designs Logo"
+                src={branding.logoLight}
+                alt="NEEZA Logo"
                 width={120}
                 height={48}
                 className="h-auto w-auto max-h-12"
               />
             </div>
             <p className="text-sm leading-relaxed max-w-xs text-neutral-400">
-              East Africa's premier architecture and engineering consultancy. Designing the skyline of tomorrow, today.
+              We deliver integrated solutions in land, design, and construction with precision and excellence.
             </p>
           </div>
 
@@ -37,9 +37,11 @@ export function Footer() {
             <h4 className="text-white font-medium mb-6">Company</h4>
             <ul className="space-y-4 text-sm">
               <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
+              <li><Link href="/projects" className="hover:text-primary transition-colors">Projects</Link></li>
+              <li><Link href="/services" className="hover:text-primary transition-colors">Services</Link></li>
+              <li><Link href="/publications" className="hover:text-primary transition-colors">Publications</Link></li>
               <li><Link href="/careers" className="hover:text-primary transition-colors">Careers</Link></li>
-              <li><Link href="/blog" className="hover:text-primary transition-colors">News & Media</Link></li>
-              <li><Link href="/sustainability" className="hover:text-primary transition-colors">Sustainability Report</Link></li>
+              <li><Link href="/blog" className="hover:text-primary transition-colors">News &amp; Media</Link></li>
             </ul>
           </div>
 
@@ -47,10 +49,10 @@ export function Footer() {
           <div>
             <h4 className="text-white font-medium mb-6">Services</h4>
             <ul className="space-y-4 text-sm">
-              <li><Link href="/services#architecture" className="hover:text-primary transition-colors">Architecture Design</Link></li>
-              <li><Link href="/services#civil" className="hover:text-primary transition-colors">Civil Engineering</Link></li>
-              <li><Link href="/services#urban" className="hover:text-primary transition-colors">Urban Planning</Link></li>
-              <li><Link href="/services#interior" className="hover:text-primary transition-colors">Interior Design</Link></li>
+              <li><Link href="/services#architecture" className="hover:text-primary transition-colors">Architecture</Link></li>
+              <li><Link href="/services#construction" className="hover:text-primary transition-colors">Construction</Link></li>
+              <li><Link href="/services#project-management" className="hover:text-primary transition-colors">Project Management</Link></li>
+              <li><Link href="/services#land-acquisition" className="hover:text-primary transition-colors">Land Acquisition</Link></li>
             </ul>
           </div>
 
@@ -76,7 +78,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-neutral-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-neutral-500">
-          <p>&copy; {new Date().getFullYear()} NEEZA Designs Ltd. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} NEEZA. All rights reserved.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>

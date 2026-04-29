@@ -1,4 +1,4 @@
-import { Project, BlogPost, TeamMember, Service } from "@/types";
+import { Project, BlogPost, TeamMember, Career, Publication, Service } from "@/types";
 
 export const dummyProjects: Project[] = [
   {
@@ -10,13 +10,13 @@ export const dummyProjects: Project[] = [
     description: "A sustainable luxury residence featuring solar integration and locally sourced volcanic stone finishes.",
     imageUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
     location: "Kigali, Rwanda",
-    completionYear: 2022
+    completionYear: 2022,
   },
   {
     _id: "2",
     slug: "urban-bridge-initiative",
     title: "Urban Bridge Initiative",
-    category: "Civil Engineering",
+    category: "Construction",
     status: "Ongoing",
     description: "A state-of-the-art office complex designed for the region's growing technology sector.",
     imageUrl: "https://images.unsplash.com/photo-1545558014-8692077e9b5c?q=80&w=2070&auto=format&fit=crop",
@@ -26,12 +26,12 @@ export const dummyProjects: Project[] = [
     _id: "3",
     slug: "pearl-residences",
     title: "Pearl Residences",
-    category: "Interior",
+    category: "Architecture",
     status: "Completed",
     description: "Blending seamlessly with nature, this lodge offers luxury with zero environmental impact.",
     imageUrl: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop",
     location: "Kigali, Rwanda",
-    completionYear: 2023
+    completionYear: 2023,
   },
   {
     _id: "4",
@@ -42,13 +42,13 @@ export const dummyProjects: Project[] = [
     description: "A sustainable hospitality lodge integrated within the natural landscape.",
     imageUrl: "https://images.unsplash.com/photo-1510798831971-661eb04b3739?q=80&w=1974&auto=format&fit=crop",
     location: "Akagera, Rwanda",
-    completionYear: 2021
+    completionYear: 2021,
   },
   {
     _id: "5",
     slug: "horizon-office-tower",
     title: "Horizon Office Tower",
-    category: "Architecture",
+    category: "Construction",
     status: "Ongoing",
     description: "A 30-story commercial office tower focusing on energy efficiency.",
     imageUrl: "https://images.unsplash.com/photo-1481253127861-534498168948?q=80&w=1973&auto=format&fit=crop",
@@ -58,12 +58,22 @@ export const dummyProjects: Project[] = [
     _id: "6",
     slug: "green-city-pilot",
     title: "Green City Pilot",
-    category: "Masterplanning",
+    category: "Land Acquisition",
     status: "Ongoing",
     description: "Masterplan for a sustainable, net-zero greenhouse emission neighborhood.",
     imageUrl: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1955&auto=format&fit=crop",
     location: "Kigali, Rwanda",
-  }
+  },
+  {
+    _id: "7",
+    slug: "nyarutarama-mixed-use",
+    title: "Nyarutarama Mixed-Use Development",
+    category: "Project Management",
+    status: "Ongoing",
+    description: "End-to-end project management for a mixed-use retail and residential complex in Kigali's Nyarutarama district.",
+    imageUrl: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=2076&auto=format&fit=crop",
+    location: "Kigali, Rwanda",
+  },
 ];
 
 export const dummyPosts: BlogPost[] = [
@@ -79,8 +89,8 @@ export const dummyPosts: BlogPost[] = [
     imageUrl: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1955&auto=format&fit=crop",
     author: {
       name: "Jean-Paul Nilan.",
-      role: "Chief Architect"
-    }
+      role: "Chief Architect",
+    },
   },
   {
     _id: "2",
@@ -94,8 +104,8 @@ export const dummyPosts: BlogPost[] = [
     imageUrl: "https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=2000&auto=format&fit=crop",
     author: {
       name: "Elena Kagame",
-      role: "Sustainability Lead"
-    }
+      role: "Sustainability Lead",
+    },
   },
   {
     _id: "3",
@@ -109,8 +119,8 @@ export const dummyPosts: BlogPost[] = [
     imageUrl: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=2070&auto=format&fit=crop",
     author: {
       name: "David Mutungi",
-      role: "Civil Engineer"
-    }
+      role: "Civil Engineer",
+    },
   },
   {
     _id: "4",
@@ -124,9 +134,9 @@ export const dummyPosts: BlogPost[] = [
     imageUrl: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=2070&auto=format&fit=crop",
     author: {
       name: "Sarah Mwebaza",
-      role: "Interior Designer"
-    }
-  }
+      role: "Interior Designer",
+    },
+  },
 ];
 
 export const dummyTeam: TeamMember[] = [
@@ -135,20 +145,259 @@ export const dummyTeam: TeamMember[] = [
     name: "Yves Karangwa",
     role: "MD & Co-Founder",
     bio: "15 years of experience leading major commercial developments across East Africa.",
-    imageUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1974&auto=format&fit=crop"
+    imageUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1974&auto=format&fit=crop",
   },
   {
     _id: "2",
     name: "Jean Karangwa",
     role: "MD & Co-Founder",
     bio: "12 years of experience leading major commercial developments across East Africa.",
-    imageUrl: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1974&auto=format&fit=crop"
+    imageUrl: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1974&auto=format&fit=crop",
   },
   {
     _id: "3",
     name: "Tony Karangwa",
     role: "MD & Co-Founder",
     bio: "10 years of experience leading major commercial developments across East Africa.",
-    imageUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop"
-  }
+    imageUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop",
+  },
+];
+
+export const dummyCareers: Career[] = [
+  {
+    _id: "c1",
+    slug: "senior-architect",
+    title: "Senior Architect",
+    department: "Architecture",
+    location: "Kigali, Rwanda",
+    employmentType: "Full-time",
+    experienceLevel: "Senior",
+    description: "Lead concept and detailed design on a variety of residential and commercial projects across East Africa. You will mentor junior architects and coordinate with engineers and clients from brief to handover.",
+    requirements: [
+      "Bachelor's or Master's degree in Architecture",
+      "7+ years of professional experience",
+      "Proficiency in AutoCAD, Revit, and SketchUp",
+      "Strong portfolio of delivered projects",
+    ],
+    responsibilities: [
+      "Develop architectural designs from concept through to construction documentation",
+      "Lead client presentations and design reviews",
+      "Coordinate with structural and MEP engineers",
+      "Mentor and review work of junior team members",
+    ],
+    status: "Open",
+    featured: true,
+    createdAt: "2025-01-15T08:00:00Z",
+  },
+  {
+    _id: "c2",
+    slug: "civil-engineer-infrastructure",
+    title: "Civil Engineer - Infrastructure",
+    department: "Civil Engineering",
+    location: "Kigali, Rwanda",
+    employmentType: "Full-time",
+    experienceLevel: "Mid",
+    description: "Design and oversee infrastructure systems including roads, drainage, and utilities for large-scale urban development projects.",
+    requirements: [
+      "BSc in Civil Engineering",
+      "4+ years of relevant infrastructure experience",
+      "Proficiency in AutoCAD Civil 3D",
+      "Experience with EIA and permitting processes in Rwanda",
+    ],
+    responsibilities: [
+      "Prepare detailed civil engineering designs and drawings",
+      "Conduct site surveys and investigations",
+      "Supervise construction works and ensure compliance",
+      "Prepare bills of quantities and technical reports",
+    ],
+    status: "Open",
+    featured: false,
+    createdAt: "2025-02-10T08:00:00Z",
+  },
+  {
+    _id: "c3",
+    slug: "project-manager",
+    title: "Project Manager",
+    department: "Project Management",
+    location: "Kigali, Rwanda",
+    employmentType: "Full-time",
+    experienceLevel: "Lead",
+    description: "Oversee end-to-end delivery of construction and development projects, managing timelines, budgets, subcontractors, and client relationships.",
+    requirements: [
+      "Degree in Engineering, Architecture, or Construction Management",
+      "PMP or PRINCE2 certification preferred",
+      "8+ years of project management experience",
+      "Strong proficiency in MS Project or Primavera",
+    ],
+    responsibilities: [
+      "Manage project schedules, budgets, and risk registers",
+      "Coordinate all project stakeholders and contractors",
+      "Prepare and present monthly progress reports",
+      "Ensure health, safety, and quality standards are met",
+    ],
+    status: "Open",
+    featured: true,
+    createdAt: "2025-03-05T08:00:00Z",
+  },
+  {
+    _id: "c4",
+    slug: "interior-designer",
+    title: "Interior Designer",
+    department: "Interior Design",
+    location: "Kigali, Rwanda",
+    employmentType: "Contract",
+    experienceLevel: "Mid",
+    description: "Create compelling and functional interior design concepts for luxury residential and hospitality projects across the region.",
+    requirements: [
+      "Degree in Interior Design or Architecture",
+      "4+ years of experience in luxury residential or hospitality projects",
+      "Proficiency in 3ds Max, V-Ray, and Adobe Suite",
+    ],
+    responsibilities: [
+      "Develop interior design concepts and mood boards",
+      "Specify materials, finishes, furniture, and lighting",
+      "Produce detailed interior drawings and schedules",
+      "Liaise with contractors and procurement teams during implementation",
+    ],
+    status: "Open",
+    featured: false,
+    createdAt: "2025-03-20T08:00:00Z",
+  },
+];
+
+export const dummyPublications: Publication[] = [
+  {
+    _id: "p1",
+    slug: "east-africa-urban-growth-report-2024",
+    title: "East Africa Urban Growth Report 2024",
+    summary: "A comprehensive analysis of urbanisation trends across Rwanda, Kenya, Uganda, and Tanzania with projections through 2035.",
+    type: "Report",
+    publishedAt: "2024-06-01T00:00:00Z",
+    fileUrl: "https://unhabitat.org/sites/default/files/2022/09/swcr2022.pdf",
+    fileSize: "3.2 MB",
+    tags: ["urbanisation", "Rwanda", "East Africa", "infrastructure"],
+  },
+  {
+    _id: "p2",
+    slug: "neeza-project-portfolio-2023",
+    title: "NEEZA Project Portfolio 2023",
+    summary: "An illustrated overview of all major projects completed or under execution by NEEZA Designs in 2023.",
+    type: "Portfolio",
+    publishedAt: "2024-01-15T00:00:00Z",
+    fileSize: "8.5 MB",
+    tags: ["portfolio", "2023", "projects"],
+  },
+  {
+    _id: "p3",
+    slug: "rwanda-building-regulations-guide",
+    title: "Rwanda Building Regulations: Practitioner's Guide",
+    summary: "A plain-language guide for architects and developers navigating the Rwanda Urban Planning and Building Control Act.",
+    type: "Guide",
+    publishedAt: "2024-03-10T00:00:00Z",
+    fileUrl: "https://www.mininfra.gov.rw/fileadmin/user_upload/building_regulations_2022.pdf",
+    fileSize: "895 KB",
+    tags: ["building regulations", "Rwanda", "compliance"],
+  },
+  {
+    _id: "p4",
+    slug: "sustainable-construction-policy-brief",
+    title: "Sustainable Construction in Africa: Policy Brief",
+    summary: "Policy recommendations for governments to accelerate adoption of green building standards across Sub-Saharan Africa.",
+    type: "Policy",
+    publishedAt: "2024-08-20T00:00:00Z",
+    fileUrl: "https://openknowledge.worldbank.org/bitstream/handle/10986/33101/9781464815027.pdf",
+    fileSize: "1.1 MB",
+    tags: ["policy", "sustainability", "green building", "Africa"],
+  },
+  {
+    _id: "p5",
+    slug: "kigali-masterplan-insights",
+    title: "Kigali Masterplan Insights: Lessons for African Cities",
+    summary: "Transferable lessons from Kigali City's urban development framework on mixed-use zoning and transport-oriented development.",
+    type: "Report",
+    publishedAt: "2025-01-10T00:00:00Z",
+    fileUrl: "https://unhabitat.org/sites/default/files/2023/06/kigali_city_profile.pdf",
+    fileSize: "2.4 MB",
+    tags: ["masterplan", "Kigali", "urban design", "housing"],
+  },
+  {
+    _id: "p6",
+    slug: "neeza-company-profile-2024",
+    title: "NEEZA Designs — Company Profile 2024",
+    summary: "Official company profile covering our services, team, methodology, and project portfolio for 2024.",
+    type: "Portfolio",
+    publishedAt: "2024-12-01T00:00:00Z",
+    fileSize: "4.7 MB",
+    tags: ["company profile", "NEEZA", "2024"],
+  },
+  {
+    _id: "p7",
+    slug: "land-acquisition-law-rwanda",
+    title: "Expropriation Law No. 32/2015 — Rwanda",
+    summary: "Official expropriation law governing land acquisition in Rwanda, including compensation criteria and appeal procedures.",
+    type: "Law",
+    publishedAt: "2023-09-18T00:00:00Z",
+    fileUrl: "https://www.mininfra.gov.rw/fileadmin/user_upload/building_regulations_2022.pdf",
+    fileSize: "216 KB",
+    tags: ["law", "land acquisition", "expropriation", "Rwanda"],
+  },
+];
+
+export const dummyServices: Service[] = [
+  {
+    _id: "s1",
+    title: "Architecture",
+    shortDescription: "Designing functional, aesthetic, and sustainable buildings tailored to client needs.",
+    imageUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
+    buttonTitle: "Request Architecture Services",
+    features: [
+      { name: "Concept Design & Visualization", meaning: "3D renders, drawings, and models that bring your vision to life before construction begins.", icon: "mdi:pencil-ruler" },
+      { name: "Space Planning & Optimization", meaning: "Intelligent layout design that maximises functionality and flow for every room and floor.", icon: "mdi:floor-plan" },
+      { name: "Sustainable Design Solutions", meaning: "Energy-efficient, environmentally responsible architecture using modern and local materials.", icon: "mdi:leaf" },
+      { name: "Regulatory Compliance & Approvals", meaning: "Full management of permits, zoning, and building authority submissions in Rwanda.", icon: "mdi:file-certificate-outline" },
+      { name: "Custom Design to Client Vision", meaning: "Every project is bespoke — shaped entirely around your brief, budget, and lifestyle.", icon: "mdi:account-heart-outline" },
+    ],
+  },
+  {
+    _id: "s2",
+    title: "Construction",
+    shortDescription: "Executing building projects by turning designs into physical structures with quality and precision.",
+    imageUrl: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=2076&auto=format&fit=crop",
+    buttonTitle: "Request Construction Services",
+    features: [
+      { name: "High-Quality Material Sourcing", meaning: "We procure durable, certified materials from trusted local and international suppliers.", icon: "mdi:package-variant-closed" },
+      { name: "Skilled Workforce & Site Supervision", meaning: "Experienced site teams oversee every trade to maintain workmanship standards daily.", icon: "mdi:hard-hat" },
+      { name: "Cost Control & Budgeting", meaning: "Transparent budgeting with real-time cost tracking to keep projects within financial targets.", icon: "mdi:calculator-variant-outline" },
+      { name: "Timely Project Execution", meaning: "Robust scheduling and milestone management to deliver on time, every time.", icon: "mdi:clock-check-outline" },
+      { name: "Safety & Quality Assurance", meaning: "Strict HSE protocols and quality inspections at every stage of the build.", icon: "mdi:shield-check-outline" },
+    ],
+  },
+  {
+    _id: "s3",
+    title: "Project Management",
+    shortDescription: "Coordinating all aspects of a project to ensure it is completed on time, within budget, and to required standards.",
+    imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop",
+    buttonTitle: "Request Project Management",
+    features: [
+      { name: "Planning, Scheduling & Coordination", meaning: "Detailed project programmes with clear milestones, responsibilities, and dependencies.", icon: "mdi:calendar-check-outline" },
+      { name: "Budget Monitoring & Cost Efficiency", meaning: "Continuous cost tracking with value engineering to protect your investment.", icon: "mdi:chart-line" },
+      { name: "Risk Assessment & Mitigation", meaning: "Proactive identification and management of risks before they become problems.", icon: "mdi:alert-circle-outline" },
+      { name: "Stakeholder Communication", meaning: "Regular reporting and clear communication to keep all parties aligned throughout.", icon: "mdi:account-group-outline" },
+      { name: "Quality Control & Reporting", meaning: "Independent quality checks and structured reporting at every project phase.", icon: "mdi:clipboard-check-outline" },
+    ],
+  },
+  {
+    _id: "s4",
+    title: "Land Acquisition",
+    shortDescription: "Helping clients identify, evaluate, and legally secure suitable land for development.",
+    imageUrl: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2032&auto=format&fit=crop",
+    buttonTitle: "Request Land Acquisition",
+    features: [
+      { name: "Land Sourcing & Market Analysis", meaning: "Access to off-market opportunities and data-driven location assessments across Rwanda.", icon: "mdi:map-search-outline" },
+      { name: "Due Diligence & Legal Verification", meaning: "Thorough title searches, encumbrance checks, and legal status confirmation.", icon: "mdi:magnify-scan" },
+      { name: "Title Processing & Documentation", meaning: "Full handling of land registration, transfers, and official documentation with RDB/RHA.", icon: "mdi:file-document-edit-outline" },
+      { name: "Site Feasibility Studies", meaning: "Technical and commercial assessments to confirm a site is viable for your intended development.", icon: "mdi:terrain" },
+      { name: "Investment Advisory & Valuation", meaning: "Independent valuation insights and strategic advice to inform acquisition decisions.", icon: "mdi:trending-up" },
+    ],
+  },
 ];

@@ -5,8 +5,9 @@ import { AdminHeader } from "@/components/admin/Header";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
-import { Edit, ArrowRight, Trash2, Plus } from "lucide-react";
+import { Edit, ArrowRight, Trash2, Plus, Search } from "lucide-react";
 import Image from "next/image";
+import { Icon } from "@iconify/react";
 import { getServices, createService, updateService, deleteService } from "@/lib/api/services";
 import { ImageUpload } from "@/components/ui/ImageUpload";
 import { toast } from "sonner";
@@ -16,10 +17,114 @@ import type { Service } from "@/types";
 
 type FeatureForm = { name: string; meaning: string; icon: string };
 
+function IconifySearchInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const [query, setQuery] = useState(value);
+  const [results, setResults] = useState<string[]>([]);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setQuery(value);
+  }, [value]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const trimmed = query.trim();
+    if (trimmed.length < 2) {
+      setResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`https://api.iconify.design/search?query=${encodeURIComponent(trimmed)}&limit=16`);
+        if (!res.ok) {
+          setResults([]);
+          return;
+        }
+        const data = (await res.json()) as { icons?: string[] };
+        setResults(Array.isArray(data.icons) ? data.icons : []);
+      } catch {
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [open, query]);
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-neutral-700 mb-1">{label}</label>
+      <div className="relative" onBlur={() => setTimeout(() => setOpen(false), 120)}>
+        <div className="flex items-center gap-2 w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm bg-white focus-within:ring-1 focus-within:ring-primary">
+          <Search className="w-4 h-4 text-neutral-400" />
+          <input
+            value={query}
+            onFocus={() => setOpen(true)}
+            onChange={(e) => {
+              const next = e.target.value;
+              setQuery(next);
+              onChange(next);
+              setOpen(true);
+            }}
+            className="w-full outline-none"
+            placeholder="Search icons (e.g. check, map, home)"
+          />
+          <div className="shrink-0 rounded-md border border-neutral-200 bg-neutral-50 p-1.5">
+            <Icon icon={value || "mdi:help-circle-outline"} className="w-4 h-4 text-neutral-700" />
+          </div>
+        </div>
+
+        {open && (
+          <div className="absolute z-20 mt-1 w-full rounded-lg border border-neutral-200 bg-white shadow-lg max-h-56 overflow-auto">
+            {loading ? (
+              <div className="px-3 py-2 text-xs text-neutral-500">Searching icons...</div>
+            ) : results.length > 0 ? (
+              <div className="py-1">
+                {results.map((iconName) => (
+                  <button
+                    key={iconName}
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      onChange(iconName);
+                      setQuery(iconName);
+                      setOpen(false);
+                    }}
+                    className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
+                  >
+                    <Icon icon={iconName} className="w-4 h-4 text-neutral-700" />
+                    <span className="text-neutral-700">{iconName}</span>
+                  </button>
+                ))}
+              </div>
+            ) : query.trim().length >= 2 ? (
+              <div className="px-3 py-2 text-xs text-neutral-500">No icons found</div>
+            ) : (
+              <div className="px-3 py-2 text-xs text-neutral-500">Type at least 2 characters to search</div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 const emptyForm = {
   title: "",
   shortDescription: "",
-  fullDescription: "",
   imageUrl: "",
   buttonTitle: "",
   features: [{ name: "", meaning: "", icon: "mdi:check-circle-outline" }] as FeatureForm[],
@@ -68,7 +173,6 @@ export default function AdminServicesPage() {
     setForm({
       title: svc.title,
       shortDescription: svc.shortDescription,
-      fullDescription: svc.fullDescription,
       imageUrl: svc.imageUrl,
       buttonTitle: svc.buttonTitle ?? "",
       features: normalizedFeatures.length > 0 ? normalizedFeatures : emptyForm.features,
@@ -88,7 +192,6 @@ export default function AdminServicesPage() {
       const payload = {
         title: form.title.trim(),
         shortDescription: form.shortDescription.trim(),
-        fullDescription: form.fullDescription.trim(),
         imageUrl: form.imageUrl.trim() || undefined,
         buttonTitle: form.buttonTitle.trim() || undefined,
         features: form.features.map((feature) => ({
@@ -216,7 +319,7 @@ export default function AdminServicesPage() {
         )}
       </div>
 
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editing ? "Edit Service" : "New Service"}>
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editing ? "Edit Service" : "New Service"} maxWidth="2xl" >
         <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
           <Input label="Title" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: (e.target as HTMLInputElement).value }))} />
           <ImageUpload label="Service Image" folder="services" value={form.imageUrl} onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))} />
@@ -224,10 +327,6 @@ export default function AdminServicesPage() {
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-1">Short Description</label>
             <textarea rows={2} className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary resize-none" value={form.shortDescription} onChange={(e) => setForm((f) => ({ ...f, shortDescription: e.target.value }))} />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Full Description</label>
-            <textarea rows={4} className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary resize-none" value={form.fullDescription} onChange={(e) => setForm((f) => ({ ...f, fullDescription: e.target.value }))} />
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -248,10 +347,10 @@ export default function AdminServicesPage() {
                   value={feature.meaning}
                   onChange={(e) => updateFeature(index, "meaning", (e.target as HTMLInputElement).value)}
                 />
-                <Input
+                <IconifySearchInput
                   label="Icon (Iconify key)"
                   value={feature.icon}
-                  onChange={(e) => updateFeature(index, "icon", (e.target as HTMLInputElement).value)}
+                  onChange={(value) => updateFeature(index, "icon", value)}
                 />
                 <div className="flex justify-end">
                   <button

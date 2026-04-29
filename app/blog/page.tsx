@@ -5,10 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { getPosts } from "@/lib/api/posts";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { cn, formatDate } from "@/lib/utils";
-import { Send, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { NewsletterBanner } from "@/components/layout/NewsletterBanner";
 import type { BlogPost } from "@/types";
 
 const categories = ["All", "Sustainability", "Urbanization", "Design Trends", "Rwanda Projects"];
@@ -147,28 +147,7 @@ export default function BlogPage() {
         </div>
 
         {/* Newsletter Banner */}
-        <div className="bg-white rounded-3xl p-12 md:p-20 text-center border border-neutral-100 shadow-sm max-w-4xl mx-auto">
-          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 text-primary">
-            <Send className="w-6 h-6" />
-          </div>
-          <h2 className="font-heading text-3xl font-bold text-neutral-900 mb-4">Stay Informed</h2>
-          <p className="text-neutral-500 mb-8 max-w-md mx-auto">
-            Subscribe to our monthly newsletter for exclusive architectural insights, project updates, and sustainability trends.
-          </p>
-          <form className="max-w-md mx-auto relative flex items-center" onSubmit={(e) => e.preventDefault()}>
-            <Input 
-              type="email" 
-              placeholder="Email address" 
-              className="h-14 pr-36 rounded-full border-neutral-200 bg-neutral-50 shadow-inner" 
-            />
-            <Button type="submit" className="absolute right-1 rounded-full h-12 px-6 shadow-md">
-              Subscribe
-            </Button>
-          </form>
-          <p className="text-[10px] text-neutral-400 uppercase tracking-widest mt-4 text-center">
-            Zero spam. Unsubscribe anytime.
-          </p>
-        </div>
+        <NewsletterBanner />
 
       </div>
     </div>

@@ -209,20 +209,19 @@ export default function AdminBlogPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-neutral-200 shadow-sm overflow-hidden">
-          {loading ? (
-            <div className="p-12 text-center text-neutral-400 text-sm">Loading…</div>
-          ) : (
-            <Table data={posts} columns={columns} className="w-full text-sm" />
-          )}
-          <div className="p-6 pt-0 border-t border-neutral-100 flex items-center justify-between">
-            <span className="text-xs text-neutral-500">Showing <strong className="text-neutral-900">{posts.length}</strong> of <strong className="text-neutral-900">{total}</strong> posts</span>
-            <div className="flex gap-2">
-              <button disabled={page === 1} onClick={() => setPage((p) => p - 1)} className="w-8 h-8 flex items-center justify-center border border-neutral-200 rounded-md text-neutral-400 hover:bg-neutral-50 disabled:opacity-40">&lt;</button>
-              <button disabled={page * limit >= total} onClick={() => setPage((p) => p + 1)} className="w-8 h-8 flex items-center justify-center border border-neutral-200 rounded-md text-neutral-400 hover:bg-neutral-50 disabled:opacity-40">&gt;</button>
-            </div>
-          </div>
-        </div>
+        <Table
+            data={posts}
+            columns={columns}
+            className="w-full text-sm"
+            loading={loading}
+            pagination={{
+              currentPage: page,
+              totalPages: Math.ceil(total / limit) || 1,
+              totalItems: total,
+              pageSize: limit,
+              onPageChange: (p) => setPage(p),
+            }}
+          />
       </div>
 
       {/* Create / Edit Modal */}

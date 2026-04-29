@@ -8,6 +8,15 @@ import { Icon } from "@iconify/react";
 import { getServices } from "@/lib/api/services";
 import type { Service } from "@/types";
 
+function serviceToProjectCategory(serviceTitle: string): string {
+  const lower = serviceTitle.toLowerCase();
+  if (lower.includes("architecture")) return "Architecture";
+  if (lower.includes("construction")) return "Construction";
+  if (lower.includes("project management")) return "Project Management";
+  if (lower.includes("land")) return "Land Acquisition";
+  return "Architecture";
+}
+
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,7 +64,7 @@ export default function ServicesPage() {
         {loading ? (
           <div className="text-center text-neutral-400 py-16 text-sm">Loading services…</div>
         ) : services.map((svc, idx) => (
-          <section key={svc._id} id={svc._id} className="scroll-mt-32">
+          <section key={svc._id} id={svc.title.toLowerCase().replace(/\s+/g, "-")} className="scroll-mt-32">
             <div className={`flex flex-col md:flex-row gap-16 lg:gap-24 items-center ${idx % 2 !== 0 ? "md:flex-row-reverse" : ""}`}>
               <div className="flex-1 w-full">
                 <div className="text-primary text-xs font-bold tracking-widest uppercase mb-6">
@@ -80,9 +89,18 @@ export default function ServicesPage() {
                   })}
                 </div>
                 <div className="mt-12">
-                  <Button variant="outline" className="border-black text-black rounded-md bg-white hover:bg-black hover:text-white transition-colors duration-100">
-                    {svc.buttonTitle ?? "Learn More"}
-                  </Button>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Link href={`/contact?service=${encodeURIComponent(svc.title)}`}>
+                      <Button className="rounded-md">
+                        {svc.buttonTitle ?? `Request ${svc.title} Services`}
+                      </Button>
+                    </Link>
+                    <Link href={`/projects?category=${encodeURIComponent(serviceToProjectCategory(svc.title))}`}>
+                      <Button variant="outline" className="border-black text-black rounded-md bg-white hover:bg-black hover:text-white transition-colors duration-100">
+                        View Related Projects
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </div>
               <div className="flex-1 w-full">

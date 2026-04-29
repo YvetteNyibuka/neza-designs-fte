@@ -48,7 +48,7 @@ const replyTemplates = [
     label: "Acknowledge Inquiry",
     subject: "We received your inquiry",
     message:
-      "Thank you for contacting NEEZA Designs. We have received your inquiry and our team is reviewing the details. We will follow up with next steps shortly.",
+      "Thank you for contacting NEEZA. We have received your inquiry and our team is reviewing the details. We will follow up with next steps shortly.",
   },
   {
     key: "request-details",
