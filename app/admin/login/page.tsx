@@ -47,9 +47,21 @@ export default function AdminLoginPage() {
         router.replace("/admin");
       }
     } catch (err: unknown) {
+      const axiosLikeError = err as {
+        code?: string;
+        message?: string;
+        response?: { data?: { message?: string } };
+      };
+      const serverMessage = axiosLikeError?.response?.data?.message;
+      const isNetworkFailure = !axiosLikeError?.response;
+      const isTimeout = axiosLikeError?.code === "ECONNABORTED" || axiosLikeError?.message?.toLowerCase().includes("timeout");
       const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        "Invalid credentials.";
+        serverMessage ||
+        (isTimeout
+          ? "Login request timed out. Please try again in a few seconds."
+          : isNetworkFailure
+            ? "Unable to reach the server. Please check your connection and try again."
+            : "Invalid credentials.");
       setError(msg);
       toastApiErrors(err, msg);
     } finally {
