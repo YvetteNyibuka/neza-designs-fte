@@ -39,6 +39,11 @@ export async function getCareers(params?: CareersQuery) {
   }
 }
 
+export async function getAdminCareers(params?: CareersQuery) {
+  const { data } = await api.get("/careers/admin/all", { params });
+  return data;
+}
+
 export async function getCareer(slug: string) {
   const { data } = await api.get(`/careers/${slug}`);
   return data;

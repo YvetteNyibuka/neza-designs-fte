@@ -4,7 +4,15 @@ export interface AuthUser {
   role: string;
 }
 
-export type ProjectCategory = "Architecture" | "Construction" | "Project Management" | "Land Acquisition";
+export interface CategoryItem {
+  _id?: string;
+  name: string;
+  slug: string;
+  description?: string;
+  order: number;
+}
+
+export type ProjectCategory = string;
 export type ProjectStatus = "Completed" | "Ongoing" | "Handed Over" | "Consulted";
 
 export interface Project {
@@ -21,7 +29,7 @@ export interface Project {
   client?: string;
 }
 
-export type BlogPostCategory = "Sustainability" | "Urbanization" | "Design Trends" | "Rwanda Projects" | "FEATURED INSIGHTS";
+export type BlogPostCategory = string;
 
 export interface BlogPost {
   _id: string;

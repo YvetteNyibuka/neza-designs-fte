@@ -3,18 +3,11 @@
 import { Suspense, useState, useEffect } from "react";
 import Image from "next/image";
 import { getProjects } from "@/lib/api/projects";
+import { getCategories } from "@/lib/api/categories";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import type { Project } from "@/types";
-
-const categoryFilters = [
-  { label: "All Categories" },
-  { label: "Architecture" },
-  { label: "Construction" },
-  { label: "Project Management" },
-  { label: "Land Acquisition" },
-];
 
 const statusFilters = [
   { label: "All Statuses" },
@@ -30,12 +23,21 @@ function ProjectsPageContent() {
   const [activeStatus, setActiveStatus] = useState("All Statuses");
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    getCategories("projects")
+      .then((res) => setCategories(res.data.data.map((item) => item.name)))
+      .catch(() => {});
+  }, []);
+
+  const categoryFilters = ["All Categories", ...Array.from(new Set([...categories, ...projects.map((project) => project.category).filter(Boolean), activeCategory !== "All Categories" ? activeCategory : ""]))].filter(Boolean);
 
   // Read searchParams on client only to avoid hydration mismatch
   useEffect(() => {
     const incomingCategory = searchParams.get("category");
     const incomingStatus = searchParams.get("status");
-    if (incomingCategory && categoryFilters.some((c) => c.label === incomingCategory)) {
+    if (incomingCategory) {
       setActiveCategory(incomingCategory);
     }
     if (incomingStatus && statusFilters.some((s) => s.label === incomingStatus)) {
@@ -86,7 +88,7 @@ function ProjectsPageContent() {
               onChange={(e) => { setLoading(true); setActiveCategory(e.target.value); }}
               className="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-white text-sm font-medium text-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
             >
-              {categoryFilters.map(({ label }) => (
+              {categoryFilters.map((label) => (
                 <option key={label} value={label}>{label}</option>
               ))}
             </select>

@@ -1,18 +1,3 @@
-const BLOG_CATEGORIES = [
-  "Sustainability",
-  "Urbanization",
-  "Design Trends",
-  "Rwanda Projects",
-  "FEATURED INSIGHTS",
-] as const;
-
-const PROJECT_CATEGORIES = [
-  "Architecture",
-  "Construction",
-  "Project Management",
-  "Land Acquisition",
-] as const;
-
 const PROJECT_STATUSES = ["Completed", "Ongoing", "Handed Over", "Consulted"] as const;
 
 const HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/;
@@ -55,8 +40,8 @@ export function validateProjectForm(form: {
   if (title.length < 2) errors.push("title: Must be at least 2 characters");
   if (title.length > 200) errors.push("title: Must be at most 200 characters");
 
-  if (!PROJECT_CATEGORIES.includes(form.category as (typeof PROJECT_CATEGORIES)[number])) {
-    errors.push("category: Invalid category");
+  if (isBlank(form.category)) {
+    errors.push("category: Category is required");
   }
 
   if (!PROJECT_STATUSES.includes(form.status as (typeof PROJECT_STATUSES)[number])) {
@@ -145,8 +130,8 @@ export function validateBlogForm(form: {
 
   if (plainContent.length < 50) errors.push("content: Must be at least 50 characters");
 
-  if (!BLOG_CATEGORIES.includes(form.category as (typeof BLOG_CATEGORIES)[number])) {
-    errors.push("category: Invalid category");
+  if (isBlank(form.category)) {
+    errors.push("category: Category is required");
   }
 
   if (!Number.isInteger(readTime) || readTime < 1 || readTime > 120) {

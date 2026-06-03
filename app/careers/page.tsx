@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
+import { Badge } from "@/components/ui/Badge";
 import { getCareers } from "@/lib/api/careers";
 import { applyForCareer } from "@/lib/api/applications";
 import { toast } from "sonner";
@@ -31,6 +32,17 @@ const emptyForm: ApplyForm = {
   coverLetterUrl: "",
   resumeUrl: "",
 };
+
+// Calculate days remaining until deadline
+function getDaysUntilDeadline(deadline?: string): number | null {
+  if (!deadline) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const deadlineDate = new Date(deadline);
+  deadlineDate.setHours(0, 0, 0, 0);
+  const daysRemaining = Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  return daysRemaining > 0 ? daysRemaining : 0;
+}
 
 export default function CareersPage() {
   const [careers, setCareers] = useState<Career[]>([]);
@@ -184,29 +196,61 @@ export default function CareersPage() {
               <div key={department}>
                 <h2 className="font-heading text-2xl font-bold text-neutral-900 mb-4">{department}</h2>
                 <div className="space-y-4">
-                  {jobs.map((job) => (
-                    <article key={job._id} className="bg-white border border-neutral-200 rounded-xl p-6">
-                      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-xl text-neutral-900">{job.title}</h3>
-                          <p className="text-sm text-neutral-500 mt-1">
-                            {job.location} · {job.employmentType} · {job.experienceLevel}
-                          </p>
-                          <p className="text-neutral-600 mt-3 leading-relaxed">{job.description}</p>
-                          {job.requirements.length > 0 && (
-                            <ul className="mt-4 space-y-1 list-disc list-inside text-sm text-neutral-600">
-                              {job.requirements.slice(0, 3).map((r, i) => (
-                                <li key={i}>{r}</li>
-                              ))}
-                            </ul>
-                          )}
+                  {jobs.map((job) => {
+                    const daysRemaining = getDaysUntilDeadline(job.deadline);
+                    return (
+                      <article key={job._id} className="bg-white border border-neutral-200 rounded-xl p-6">
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2 flex-wrap">
+                              <h3 className="font-semibold text-xl text-neutral-900">{job.title}</h3>
+                              <Badge
+                                variant="secondary"
+                                className={cn(
+                                  "text-[10px] px-2.5 py-1 tracking-widest uppercase font-bold whitespace-nowrap",
+                                  job.status === "Open"
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-red-100 text-red-700"
+                                )}
+                              >
+                                {job.status}
+                              </Badge>
+                              {daysRemaining !== null && (
+                                <Badge
+                                  variant="secondary"
+                                  className={cn(
+                                    "text-[10px] px-2.5 py-1 tracking-widest uppercase font-bold whitespace-nowrap",
+                                      "bg-red-100 text-red-700"                                  )}
+                                >
+                                  {daysRemaining === 0
+                                    ? "Closing Today"
+                                    : daysRemaining === 1
+                                      ? "Closing In 1 Day"
+                                      : `Closing In ${daysRemaining} Days`}
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-neutral-500 mt-2">
+                              {job.location} · {job.employmentType} · {job.experienceLevel}
+                            </p>
+                            <p className="text-neutral-600 mt-3 leading-relaxed">{job.description}</p>
+                            {job.requirements.length > 0 && (
+                              <ul className="mt-4 space-y-1 list-disc list-inside text-sm text-neutral-600">
+                                {job.requirements.slice(0, 3).map((r, i) => (
+                                  <li key={i}>{r}</li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                          <div className="flex gap-2 shrink-0">
+                            <Button onClick={() => openApply(job)} disabled={job.status !== "Open"}>
+                              {job.status === "Open" ? "Apply Now" : "Closed"}
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex gap-2 shrink-0">
-                          <Button onClick={() => openApply(job)}>Apply Now</Button>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
+                      </article>
+                    );
+                  })}
                 </div>
               </div>
             ))}

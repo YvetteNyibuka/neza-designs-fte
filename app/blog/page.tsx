@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getPosts } from "@/lib/api/posts";
+import { getCategories } from "@/lib/api/categories";
 import { Badge } from "@/components/ui/Badge";
 import { cn, formatDate } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
@@ -11,12 +12,19 @@ import { Button } from "@/components/ui/Button";
 import { NewsletterBanner } from "@/components/layout/NewsletterBanner";
 import type { BlogPost } from "@/types";
 
-const categories = ["All", "Sustainability", "Urbanization", "Design Trends", "Rwanda Projects"];
-
 export default function BlogPage() {
   const [activeCat, setActiveCat] = useState("All");
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    getCategories("blogs")
+      .then((res) => setCategories(res.data.data.map((item) => item.name)))
+      .catch(() => {});
+  }, []);
+
+  const categoryOptions = ["All", ...Array.from(new Set([...categories, ...posts.map((post) => post.category).filter(Boolean)]))];
 
   useEffect(() => {
     setLoading(true);
@@ -62,7 +70,7 @@ export default function BlogPage() {
       {/* Tabs */}
       <section className="container mx-auto px-4 md:px-8 max-w-7xl -mt-8 relative z-20">
         <div className="bg-white rounded-full p-2 shadow-lg flex flex-wrap justify-center sm:justify-start gap-2 border border-neutral-100 max-w-fit mx-auto sm:mx-0">
-          {categories.map((cat) => (
+          {categoryOptions.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveCat(cat)}

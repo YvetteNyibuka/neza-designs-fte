@@ -9,17 +9,18 @@ import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Edit, Trash2, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { CategoryManagerPanel } from "@/components/admin/CategoryManagerPanel";
 import { getProjects, createProject, updateProject, deleteProject } from "@/lib/api/projects";
+import { getCategories } from "@/lib/api/categories";
 import { ImageUpload } from "@/components/ui/ImageUpload";
 import { toast } from "sonner";
 import { toastApiErrors, toastValidationErrors } from "@/lib/apiErrorToast";
 import { validateProjectForm } from "@/lib/formValidation";
 import type { Project } from "@/types";
 
-const CATEGORIES = ["Architecture", "Construction", "Project Management", "Land Acquisition"] as const;
 const STATUSES = ["Completed", "Ongoing", "Handed Over", "Consulted"] as const;
 
-const emptyForm = { title: "", category: "Architecture" as Project["category"], status: "Ongoing" as Project["status"], description: "", imageUrl: "", location: "", client: "", completionYear: "" };
+const emptyForm = { title: "", category: "" as Project["category"], status: "Ongoing" as Project["status"], description: "", imageUrl: "", location: "", client: "", completionYear: "" };
 
 export default function AdminProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -34,6 +35,8 @@ export default function AdminProjectsPage() {
   const [saving, setSaving] = useState(false);
   const [deleteSlug, setDeleteSlug] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [pageTab, setPageTab] = useState<"projects" | "categories">("projects");
 
   const limit = 10;
 
@@ -51,9 +54,20 @@ export default function AdminProjectsPage() {
 
   useEffect(() => { fetchProjects(); }, [fetchProjects]);
 
+  useEffect(() => {
+    getCategories("projects")
+      .then((res) => setCategories(res.data.data.map((item) => item.name)))
+      .catch((err) => {
+        console.error("Failed to fetch project categories:", err);
+        toast.error("Failed to load project categories");
+      });
+  }, []);
+
+  const categoryOptions = Array.from(new Set([...categories, ...projects.map((project) => project.category).filter(Boolean)]));
+
   function openCreate() {
     setEditing(null);
-    setForm(emptyForm);
+    setForm({ ...emptyForm, category: categoryOptions[0] ?? "" });
     setModalOpen(true);
   }
 
@@ -187,41 +201,69 @@ export default function AdminProjectsPage() {
       <AdminHeader
         title="Project Management"
         actions={
-          <Button className="h-10" onClick={openCreate}>
+          pageTab === "projects" ? <Button className="h-10" onClick={openCreate}>
             <Plus className="w-4 h-4 mr-2" /> New Project
-          </Button>
+          </Button> : null
         }
       />
 
       <div className="p-8 max-w-350">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-          <div className="relative w-full max-w-sm">
-            <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Find a project..." className="w-full pl-10 pr-4 py-2 bg-white border border-neutral-200 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-primary shadow-sm" />
-          </div>
-          <div className="flex gap-6 text-sm font-bold border-b border-neutral-200 w-full md:w-auto">
-            {tabs.map((tab) => (
-              <button key={tab} className={cn("pb-3 px-1 relative whitespace-nowrap", activeTab === tab ? "text-primary" : "text-neutral-500")} onClick={() => { setActiveTab(tab); setPage(1); }}>
-                {tab}
-                {activeTab === tab && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></div>}
-              </button>
-            ))}
-          </div>
+        <div className="flex gap-1 mb-8 border-b border-neutral-200">
+          <button
+            onClick={() => setPageTab("projects")}
+            className={`px-5 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${pageTab === "projects" ? "border-primary text-primary" : "border-transparent text-neutral-500 hover:text-neutral-800"}`}
+          >
+            Projects
+          </button>
+          <button
+            onClick={() => setPageTab("categories")}
+            className={`px-5 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${pageTab === "categories" ? "border-primary text-primary" : "border-transparent text-neutral-500 hover:text-neutral-800"}`}
+          >
+            Project Categories
+          </button>
         </div>
 
-        <Table
-            data={projects}
-            columns={columns}
-            className="w-full text-sm mb-12"
-            loading={loading}
-            pagination={{
-              currentPage: page,
-              totalPages: Math.ceil(total / limit) || 1,
-              totalItems: total,
-              pageSize: limit,
-              onPageChange: (p) => setPage(p),
-            }}
+        {pageTab === "projects" ? (
+          <>
+            <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+              <div className="relative w-full max-w-sm">
+                <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Find a project..." className="w-full pl-10 pr-4 py-2 bg-white border border-neutral-200 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-primary shadow-sm" />
+              </div>
+              <div className="flex gap-6 text-sm font-bold border-b border-neutral-200 w-full md:w-auto">
+                {tabs.map((tab) => (
+                  <button key={tab} className={cn("pb-3 px-1 relative whitespace-nowrap", activeTab === tab ? "text-primary" : "text-neutral-500")} onClick={() => { setActiveTab(tab); setPage(1); }}>
+                    {tab}
+                    {activeTab === tab && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></div>}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Table
+              data={projects}
+              columns={columns}
+              className="w-full text-sm mb-12"
+              loading={loading}
+              pagination={{
+                currentPage: page,
+                totalPages: Math.ceil(total / limit) || 1,
+                totalItems: total,
+                pageSize: limit,
+                onPageChange: (p) => setPage(p),
+              }}
+            />
+          </>
+        ) : (
+          <CategoryManagerPanel
+            scope="projects"
+            title="Project Categories"
+            hint="Manage the categories used in project forms and the public portfolio filter."
+            emptyMessage="No project categories yet. Create the first one for projects and filters."
+            createLabel="New Category"
+            onCategoriesChange={(items) => setCategories(items.map((item) => item.name))}
           />
+        )}
 
       </div>
 
@@ -231,9 +273,14 @@ export default function AdminProjectsPage() {
           <Input label="Title" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: (e.target as HTMLInputElement).value }))} />
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-1">Category</label>
-            <select className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value as Project["category"] }))}>
-              {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
-            </select>
+            {categoryOptions.length > 0 ? (
+              <select className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value as Project["category"] }))}>
+                <option value="">Select category</option>
+                {categoryOptions.map((c) => <option key={c}>{c}</option>)}
+              </select>
+            ) : (
+              <Input label="Category" value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: (e.target as HTMLInputElement).value }))} />
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-1">Status</label>

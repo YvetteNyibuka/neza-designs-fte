@@ -5,7 +5,9 @@ import { AdminHeader } from "@/components/admin/Header";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
-import { createCareer, deleteCareer, getCareers, updateCareer } from "@/lib/api/careers";
+import { CategoryManagerPanel } from "@/components/admin/CategoryManagerPanel";
+import { createCareer, deleteCareer, getAdminCareers, updateCareer } from "@/lib/api/careers";
+import { getCategories } from "@/lib/api/categories";
 import { toast } from "sonner";
 import { toastApiErrors, parseApiFieldErrors } from "@/lib/apiErrorToast";
 import type { Career } from "@/types";
@@ -22,6 +24,7 @@ type CareerForm = {
   description: string;
   requirements: string[];
   responsibilities: string[];
+  deadline: string;
   status: Career["status"];
 };
 
@@ -34,6 +37,7 @@ const emptyForm: CareerForm = {
   description: "",
   requirements: [],
   responsibilities: [],
+  deadline: "",
   status: "Open",
 };
 
@@ -43,7 +47,7 @@ export default function AdminCareersPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Career | null>(null);
   const [form, setForm] = useState<CareerForm>(emptyForm);
-  const [activeTab, setActiveTab] = useState<"postings" | "applications">("postings");
+  const [activeTab, setActiveTab] = useState<"postings" | "applications" | "departments">("postings");
   const [selectedCareerForApps, setSelectedCareerForApps] = useState<Career | null>(null);
   const [allApplications, setAllApplications] = useState<JobApplication[]>([]);
   const [appsLoading, setAppsLoading] = useState(false);
@@ -52,25 +56,37 @@ export default function AdminCareersPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [requirementInput, setRequirementInput] = useState("");
   const [responsibilityInput, setResponsibilityInput] = useState("");
+  const [departmentOptions, setDepartmentOptions] = useState<string[]>([]);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
-    const res = await getCareers({ limit: 100 }).catch(() => null);
+    const res = await getAdminCareers({ limit: 100 }).catch(() => null);
     if (res) setItems(res.data?.data ?? []);
     setLoading(false);
+  }, []);
+
+  const fetchDepartments = useCallback(async () => {
+    try {
+      const res = await getCategories("careers");
+      setDepartmentOptions(res.data.data.map((item) => item.name));
+    } catch (err) {
+      console.error("Failed to fetch career departments:", err);
+      toast.error("Failed to load career departments");
+    }
   }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       void fetchItems();
+      void fetchDepartments();
     }, 0);
 
     return () => clearTimeout(timer);
-  }, [fetchItems]);
+  }, [fetchDepartments, fetchItems]);
 
   function openCreate() {
     setEditing(null);
-    setForm(emptyForm);
+    setForm({ ...emptyForm, department: departmentOptions[0] ?? "" });
     setRequirementInput("");
     setResponsibilityInput("");
     setFieldErrors({});
@@ -88,6 +104,7 @@ export default function AdminCareersPage() {
       description: item.description,
       requirements: item.requirements,
       responsibilities: item.responsibilities,
+      deadline: item.deadline ? new Date(item.deadline).toISOString().slice(0, 10) : "",
       status: item.status,
     });
     setRequirementInput("");
@@ -139,6 +156,7 @@ export default function AdminCareersPage() {
       description: form.description.trim(),
       requirements: form.requirements.map((v) => v.trim()).filter(Boolean),
       responsibilities: form.responsibilities.map((v) => v.trim()).filter(Boolean),
+      deadline: form.deadline ? new Date(form.deadline).toISOString() : undefined,
       status: form.status,
     };
 
@@ -152,6 +170,7 @@ export default function AdminCareersPage() {
       }
       setModalOpen(false);
       fetchItems();
+      fetchDepartments();
     } catch (err: unknown) {
       setFieldErrors(parseApiFieldErrors(err));
       toastApiErrors(err, "Failed to save career");
@@ -244,6 +263,12 @@ export default function AdminCareersPage() {
               </span>
             )}
           </button>
+          <button
+            onClick={() => setActiveTab("departments")}
+            className={`px-5 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === "departments" ? "border-primary text-primary" : "border-transparent text-neutral-500 hover:text-neutral-800"}`}
+          >
+            Departments
+          </button>
         </div>
 
         {/* Postings Tab */}
@@ -257,6 +282,11 @@ export default function AdminCareersPage() {
                     <h3 className="font-semibold text-lg text-neutral-900">{item.title}</h3>
                     <p className="text-sm text-neutral-500">{item.department} · {item.location}</p>
                     <p className="text-sm text-neutral-600 mt-2">{item.employmentType} · {item.experienceLevel} · {item.status}</p>
+                    {item.deadline ? (
+                      <p className="text-sm mt-2 text-neutral-500">
+                        Apply by {new Date(item.deadline).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                      </p>
+                    ) : null}
                   </div>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={() => loadApplications(item)}>Applications</Button>
@@ -361,6 +391,17 @@ export default function AdminCareersPage() {
             )}
           </div>
         )}
+
+        {activeTab === "departments" && (
+          <CategoryManagerPanel
+            scope="careers"
+            title="Career Departments"
+            hint="Manage the department values used in career postings and the public careers filter."
+            emptyMessage="No departments yet. Create the first one for careers and filters."
+            createLabel="New Department"
+            onCategoriesChange={(items) => setDepartmentOptions(items.map((item) => item.name))}
+          />
+        )}
       </div>
 
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editing ? "Edit Job" : "New Job"} maxWidth="2xl">
@@ -370,12 +411,32 @@ export default function AdminCareersPage() {
             {fieldErrors.title && <p className="text-red-500 text-xs mt-1">{fieldErrors.title}</p>}
           </div>
           <div>
-            <Input label="Department" value={form.department} onChange={(e) => setForm((f) => ({ ...f, department: (e.target as HTMLInputElement).value }))} />
+            {departmentOptions.length > 0 ? (
+              <>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Department</label>
+                <select
+                  className="w-full border border-neutral-200 rounded-lg px-3 py-2"
+                  value={form.department}
+                  onChange={(e) => setForm((f) => ({ ...f, department: e.target.value }))}
+                >
+                  <option value="">Select department</option>
+                  {departmentOptions.map((option) => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </>
+            ) : (
+              <Input label="Department" value={form.department} onChange={(e) => setForm((f) => ({ ...f, department: (e.target as HTMLInputElement).value }))} />
+            )}
             {fieldErrors.department && <p className="text-red-500 text-xs mt-1">{fieldErrors.department}</p>}
           </div>
           <div>
             <Input label="Location" value={form.location} onChange={(e) => setForm((f) => ({ ...f, location: (e.target as HTMLInputElement).value }))} />
             {fieldErrors.location && <p className="text-red-500 text-xs mt-1">{fieldErrors.location}</p>}
+          </div>
+          <div>
+            <Input label="Application Deadline" type="date" value={form.deadline} onChange={(e) => setForm((f) => ({ ...f, deadline: (e.target as HTMLInputElement).value }))} />
+            {fieldErrors.deadline && <p className="text-red-500 text-xs mt-1">{fieldErrors.deadline}</p>}
           </div>
 
           <div>
