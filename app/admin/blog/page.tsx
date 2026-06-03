@@ -10,7 +10,9 @@ import { Input } from "@/components/ui/Input";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { CategoryManagerPanel } from "@/components/admin/CategoryManagerPanel";
 import { getPosts, createPost, updatePost, deletePost } from "@/lib/api/posts";
+import { getCategories } from "@/lib/api/categories";
 import { ImageUpload } from "@/components/ui/ImageUpload";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import { toast } from "sonner";
@@ -18,10 +20,8 @@ import { toastApiErrors, toastValidationErrors } from "@/lib/apiErrorToast";
 import { validateBlogForm } from "@/lib/formValidation";
 import type { BlogPost } from "@/types";
 
-const CATEGORIES = ["Sustainability", "Urbanization", "Design Trends", "Rwanda Projects", "FEATURED INSIGHTS"] as const;
-
 const emptyForm = {
-  title: "", excerpt: "", content: "", category: "Sustainability" as BlogPost["category"],
+  title: "", excerpt: "", content: "", category: "" as BlogPost["category"],
   imageUrl: "", readTime: "5", publishedAt: new Date().toISOString().slice(0, 10),
   authorName: "", authorRole: "",
 };
@@ -39,6 +39,8 @@ export default function AdminBlogPage() {
   const [saving, setSaving] = useState(false);
   const [deleteSlug, setDeleteSlug] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [pageTab, setPageTab] = useState<"posts" | "categories">("posts");
 
   const limit = 10;
 
@@ -56,9 +58,20 @@ export default function AdminBlogPage() {
 
   useEffect(() => { fetchPosts(); }, [fetchPosts]);
 
+  useEffect(() => {
+    getCategories("blogs")
+      .then((res) => setCategories(res.data.data.map((item) => item.name)))
+      .catch((err) => {
+        console.error("Failed to fetch blog categories:", err);
+        toast.error("Failed to load blog categories");
+      });
+  }, []);
+
+  const categoryOptions = Array.from(new Set([...categories, ...posts.map((post) => post.category).filter(Boolean)]));
+
   function openCreate() {
     setEditing(null);
-    setForm(emptyForm);
+    setForm({ ...emptyForm, category: categoryOptions[0] ?? "" });
     setModalOpen(true);
   }
 
@@ -185,43 +198,70 @@ export default function AdminBlogPage() {
       <AdminHeader
         title="Blog Management"
         actions={
-          <Button className="h-10" onClick={openCreate}>
+          pageTab === "posts" ? <Button className="h-10" onClick={openCreate}>
             <Plus className="w-4 h-4 mr-2" /> New Post
-          </Button>
+          </Button> : null
         }
       />
 
       <div className="p-8 max-w-350">
-        {/* Search & Tabs Block */}
-        <div className="bg-white p-6 rounded-xl border border-neutral-200 shadow-sm mb-6">
-          <div className="flex flex-col lg:flex-row justify-between gap-6 mb-6">
-            <div className="relative w-full max-w-lg">
-              <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" />
-              <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search by title or author…" className="w-full pl-12 pr-4 py-3 bg-white border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary" />
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {["All", ...CATEGORIES].map((cat) => (
-              <button key={cat} onClick={() => { setActiveCat(cat); setPage(1); }} className={cn("px-4 py-1.5 rounded-full border text-[11px] font-bold tracking-wider uppercase transition-colors", activeCat === cat ? "bg-[#F7EFEA] border-transparent text-primary" : "bg-white border-neutral-200 text-neutral-500 hover:bg-neutral-50")}>
-                {cat}
-              </button>
-            ))}
-          </div>
+        <div className="flex gap-1 mb-8 border-b border-neutral-200">
+          <button
+            onClick={() => setPageTab("posts")}
+            className={`px-5 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${pageTab === "posts" ? "border-primary text-primary" : "border-transparent text-neutral-500 hover:text-neutral-800"}`}
+          >
+            Blog Posts
+          </button>
+          <button
+            onClick={() => setPageTab("categories")}
+            className={`px-5 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${pageTab === "categories" ? "border-primary text-primary" : "border-transparent text-neutral-500 hover:text-neutral-800"}`}
+          >
+            Blog Categories
+          </button>
         </div>
 
-        <Table
-            data={posts}
-            columns={columns}
-            className="w-full text-sm"
-            loading={loading}
-            pagination={{
-              currentPage: page,
-              totalPages: Math.ceil(total / limit) || 1,
-              totalItems: total,
-              pageSize: limit,
-              onPageChange: (p) => setPage(p),
-            }}
+        {pageTab === "posts" ? (
+          <>
+            <div className="bg-white p-6 rounded-xl border border-neutral-200 shadow-sm mb-6">
+              <div className="flex flex-col lg:flex-row justify-between gap-6 mb-6">
+                <div className="relative w-full max-w-lg">
+                  <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" />
+                  <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search by title or author…" className="w-full pl-12 pr-4 py-3 bg-white border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary" />
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {["All", ...categoryOptions].map((cat) => (
+                  <button key={cat} onClick={() => { setActiveCat(cat); setPage(1); }} className={cn("px-4 py-1.5 rounded-full border text-[11px] font-bold tracking-wider uppercase transition-colors", activeCat === cat ? "bg-[#F7EFEA] border-transparent text-primary" : "bg-white border-neutral-200 text-neutral-500 hover:bg-neutral-50")}>
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Table
+              data={posts}
+              columns={columns}
+              className="w-full text-sm"
+              loading={loading}
+              pagination={{
+                currentPage: page,
+                totalPages: Math.ceil(total / limit) || 1,
+                totalItems: total,
+                pageSize: limit,
+                onPageChange: (p) => setPage(p),
+              }}
+            />
+          </>
+        ) : (
+          <CategoryManagerPanel
+            scope="blogs"
+            title="Blog Categories"
+            hint="Manage the category values used by blog posts and the public insights filter."
+            emptyMessage="No blog categories yet. Create the first one for posts and filters."
+            createLabel="New Category"
+            onCategoriesChange={(items) => setCategories(items.map((item) => item.name))}
           />
+        )}
       </div>
 
       {/* Create / Edit Modal */}
@@ -231,9 +271,14 @@ export default function AdminBlogPage() {
           <Input label="Short Summary" value={form.excerpt} onChange={(e) => setForm((f) => ({ ...f, excerpt: (e.target as HTMLInputElement).value }))} />
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-1">Category</label>
-            <select className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value as BlogPost["category"] }))}>
-              {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
-            </select>
+            {categoryOptions.length > 0 ? (
+              <select className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary" value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value as BlogPost["category"] }))}>
+                <option value="">Select category</option>
+                {categoryOptions.map((c) => <option key={c}>{c}</option>)}
+              </select>
+            ) : (
+              <Input label="Category" value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: (e.target as HTMLInputElement).value }))} />
+            )}
           </div>
           <ImageUpload label="Cover Image" folder="posts" value={form.imageUrl} onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))} />
           <Input label="Read Time (minutes)" type="number" value={form.readTime} onChange={(e) => setForm((f) => ({ ...f, readTime: (e.target as HTMLInputElement).value }))} />
