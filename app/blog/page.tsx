@@ -74,6 +74,7 @@ export default function BlogPage() {
             <button
               key={cat}
               onClick={() => setActiveCat(cat)}
+              suppressHydrationWarning
               className={cn(
                 "px-6 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all",
                 activeCat === cat
