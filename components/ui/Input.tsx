@@ -46,6 +46,7 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement | HTMLSele
             id={inputId}
             className={cn(baseInputClasses, "min-h-20 py-3")}
             ref={ref as React.Ref<HTMLTextAreaElement>}
+            suppressHydrationWarning
             {...(registration ?? {})}
             {...(props as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
           />
@@ -58,6 +59,7 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement | HTMLSele
             id={inputId}
             className={baseInputClasses}
             ref={ref as React.Ref<HTMLSelectElement>}
+            suppressHydrationWarning
             {...(registration ?? {})}
             {...(props as React.SelectHTMLAttributes<HTMLSelectElement>)}
           >
@@ -81,6 +83,7 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement | HTMLSele
               className
             )}
             ref={ref as React.Ref<HTMLInputElement>}
+            suppressHydrationWarning
             {...registration}
             {...(props as React.InputHTMLAttributes<HTMLInputElement>)}
           />
@@ -93,6 +96,7 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement | HTMLSele
           id={inputId}
           className={cn(baseInputClasses, type === "file" && "file:border-0 file:bg-transparent file:text-sm file:font-medium p-0")}
           ref={ref as React.Ref<HTMLInputElement>}
+          suppressHydrationWarning
           {...registration}
           {...(props as React.InputHTMLAttributes<HTMLInputElement>)}
         />
