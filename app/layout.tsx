@@ -29,6 +29,9 @@ export async function generateMetadata(): Promise<Metadata> {
       shortcut: branding.favicon,
       apple: branding.favicon,
     },
+    verification: {
+      google: "ACGzMdIAO8Q83eTwUU-whzYeqQ2jhGittd0c_raozOw",
+    },
   };
 }
 

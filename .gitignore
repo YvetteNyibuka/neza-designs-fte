@@ -38,4 +38,8 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# Server-only files — never commit these
+ecosystem.config.js
+nginx/
 next-env.d.ts

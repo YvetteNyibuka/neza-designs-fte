@@ -1,6 +1,3 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
@@ -9,14 +6,14 @@ import { getProjects } from "@/lib/api/projects";
 import { MoveRight, ShieldCheck, Zap, Leaf } from "lucide-react";
 import type { Project } from "@/types";
 
-export default function Home() {
-  const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
-
-  useEffect(() => {
-    getProjects({ limit: 6 }).then((res) => {
-      setFeaturedProjects(res.data?.data ?? []);
-    }).catch(() => {});
-  }, []);
+export default async function Home() {
+  let featuredProjects: Project[] = [];
+  try {
+    const res = await getProjects({ limit: 6 });
+    featuredProjects = res.data?.data ?? [];
+  } catch {
+    // fail silently — page still renders without projects
+  }
 
   return (
     <div className="flex flex-col flex-1 w-full relative">
