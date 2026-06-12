@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import type { Project } from "@/types";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 const statusFilters = [
   { label: "All Statuses" },
@@ -59,10 +60,10 @@ function ProjectsPageContent() {
   return (
     <div className="flex flex-col flex-1 w-full bg-neutral-50">
       {/* Hero Section */}
-      <section className="relative w-full h-screen flex items-center justify-center">
+      <section className="relative w-full min-h-[60vh] flex items-center justify-center overflow-hidden pt-24 pb-16">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
+            src="/images/projectHero.jpeg"
             alt="Projects Hero"
             fill
             style={{ objectFit: "cover" }}
@@ -110,7 +111,12 @@ function ProjectsPageContent() {
         {loading ? (
           <div className="text-center text-neutral-400 py-24 text-sm">Loading projects…</div>
         ) : projects.length === 0 ? (
-          <div className="text-center text-neutral-400 py-24 text-sm">No projects found.</div>
+          <EmptyState
+            icon="mdi:office-building-outline"
+            title="No projects found"
+            description="We couldn't find any projects matching your filters. Try adjusting the category or status above."
+            action={{ label: "Clear Filters", onClick: () => { setActiveCategory("All Categories"); setActiveStatus("All Statuses"); } }}
+          />
         ) : (
           <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
             {projects.map((project, idx) => (

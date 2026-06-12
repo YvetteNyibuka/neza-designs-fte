@@ -1,6 +1,5 @@
 import api from "@/lib/axios";
 import type { Publication } from "@/types";
-import { dummyPublications } from "@/lib/data";
 
 export interface PublicationsQuery {
   page?: number;
@@ -10,30 +9,8 @@ export interface PublicationsQuery {
 }
 
 export async function getPublications(params?: PublicationsQuery) {
-  try {
-    const { data } = await api.get("/publications", { params });
-    const apiItems = data?.data?.data;
-    if (Array.isArray(apiItems) && apiItems.length > 0) {
-      return data;
-    }
-    // use local seeds when API has no records yet
-    let items = dummyPublications;
-    if (params?.type) items = items.filter((p) => p.type === params.type);
-    if (params?.search) {
-      const q = params.search.toLowerCase();
-      items = items.filter((p) => p.title.toLowerCase().includes(q) || p.summary.toLowerCase().includes(q));
-    }
-    return { data: { data: items, total: items.length } };
-  } catch {
-    // fallback to local seed data when backend is unreachable
-    let items = dummyPublications;
-    if (params?.type) items = items.filter((p) => p.type === params.type);
-    if (params?.search) {
-      const q = params.search.toLowerCase();
-      items = items.filter((p) => p.title.toLowerCase().includes(q) || p.summary.toLowerCase().includes(q));
-    }
-    return { data: { data: items, total: items.length } };
-  }
+  const { data } = await api.get("/publications", { params });
+  return data;
 }
 
 export async function getPublication(slug: string) {

@@ -367,7 +367,9 @@ export default function AdminServicesPage() {
           </div>
           <div className="flex gap-3 pt-2">
             <Button variant="outline" className="flex-1" onClick={() => setModalOpen(false)}>Cancel</Button>
-            <Button className="flex-1" onClick={handleSave} disabled={saving}>{saving ? "Saving…" : "Save"}</Button>
+            <Button className="flex-1" onClick={handleSave} disabled={saving}>
+              {saving ? <span className="flex items-center gap-2"><Icon icon="mdi:loading" className="w-4 h-4 animate-spin" />{editing ? "Updating…" : "Creating…"}</span> : (editing ? "Update" : "Create")}
+            </Button>
           </div>
         </div>
       </Modal>
@@ -381,7 +383,7 @@ export default function AdminServicesPage() {
           <>
             <Button variant="outline" onClick={() => setDeleteServiceId(null)} disabled={deleting}>Cancel</Button>
             <Button variant="destructive" onClick={confirmDelete} disabled={deleting}>
-              {deleting ? "Deleting..." : "Delete"}
+              {deleting ? <span className="flex items-center gap-2"><Icon icon="mdi:loading" className="w-4 h-4 animate-spin" />Deleting…</span> : "Delete"}
             </Button>
           </>
         }

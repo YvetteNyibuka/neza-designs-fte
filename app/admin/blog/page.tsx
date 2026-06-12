@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { CategoryManagerPanel } from "@/components/admin/CategoryManagerPanel";
@@ -205,7 +206,7 @@ export default function AdminBlogPage() {
       />
 
       <div className="p-8 max-w-350">
-        <div className="flex gap-1 mb-8 border-b border-neutral-200">
+        <div className="flex gap-1 mb-8 border-b border-neutral-200 overflow-x-auto whitespace-nowrap">
           <button
             onClick={() => setPageTab("posts")}
             className={`px-5 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${pageTab === "posts" ? "border-primary text-primary" : "border-transparent text-neutral-500 hover:text-neutral-800"}`}
@@ -293,7 +294,9 @@ export default function AdminBlogPage() {
           />
           <div className="flex gap-3 pt-2">
             <Button variant="outline" className="flex-1" onClick={() => setModalOpen(false)}>Cancel</Button>
-            <Button className="flex-1" onClick={handleSave} disabled={saving}>{saving ? "Saving…" : "Save"}</Button>
+            <Button className="flex-1" onClick={handleSave} disabled={saving}>
+              {saving ? <span className="flex items-center gap-2"><Icon icon="mdi:loading" className="w-4 h-4 animate-spin" />{editing ? "Updating…" : "Creating…"}</span> : (editing ? "Update" : "Create")}
+            </Button>
           </div>
         </div>
       </Modal>
@@ -307,7 +310,7 @@ export default function AdminBlogPage() {
           <>
             <Button variant="outline" onClick={() => setDeleteSlug(null)} disabled={deleting}>Cancel</Button>
             <Button variant="destructive" onClick={confirmDelete} disabled={deleting}>
-              {deleting ? "Deleting..." : "Delete"}
+              {deleting ? <span className="flex items-center gap-2"><Icon icon="mdi:loading" className="w-4 h-4 animate-spin" />Deleting…</span> : "Delete"}
             </Button>
           </>
         }

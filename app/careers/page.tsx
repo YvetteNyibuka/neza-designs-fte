@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { toastApiErrors, parseApiFieldErrors } from "@/lib/apiErrorToast";
 import { cn } from "@/lib/utils";
 import type { Career } from "@/types";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { PhoneInput } from "@/components/ui/PhoneInput";
 import { FileUpload } from "@/components/ui/FileUpload";
 
@@ -127,17 +128,17 @@ export default function CareersPage() {
   return (
     <div className="flex flex-col flex-1 w-full bg-neutral-50">
       {/* Hero */}
-      <section className="relative w-full h-screen flex items-center justify-center">
+      <section className="relative w-full min-h-[60vh] flex items-center justify-center overflow-hidden pt-24 pb-16">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop"
+            src="/images/careersHero.jpeg"
             alt="Careers background"
             fill
             sizes="100vw"
             style={{ objectFit: "cover" }}
             priority
           />
-          <div className="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-neutral-900/65" />
         </div>
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <p className="text-accent text-xs font-bold tracking-widest uppercase mb-4">Join Our Team</p>
@@ -187,9 +188,12 @@ export default function CareersPage() {
           <div className="space-y-10">
             {loading ? <p className="text-neutral-500">Loading opportunities...</p> : null}
             {!loading && Object.keys(grouped).length === 0 ? (
-              <div className="bg-white border border-neutral-200 rounded-xl p-8 text-neutral-600">
-                No open opportunities match your filters. You can still send your CV to <a href="mailto:info.neeza@gmail.com" className="text-primary underline">info.neeza@gmail.com</a>.
-              </div>
+              <EmptyState
+                icon="mdi:briefcase-outline"
+                title="No open positions right now"
+                description="We don't have any open roles matching your filters at the moment. You can always send your CV and we'll be in touch when something comes up."
+                action={{ label: "Send Your CV", href: "mailto:info.neeza@gmail.com" }}
+              />
             ) : null}
 
             {Object.entries(grouped).map(([department, jobs]) => (

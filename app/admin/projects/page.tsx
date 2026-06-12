@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Edit, Trash2, Plus } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { cn } from "@/lib/utils";
 import { CategoryManagerPanel } from "@/components/admin/CategoryManagerPanel";
 import { getProjects, createProject, updateProject, deleteProject } from "@/lib/api/projects";
@@ -208,7 +209,7 @@ export default function AdminProjectsPage() {
       />
 
       <div className="p-8 max-w-350">
-        <div className="flex gap-1 mb-8 border-b border-neutral-200">
+        <div className="flex gap-1 mb-8 border-b border-neutral-200 overflow-x-auto whitespace-nowrap">
           <button
             onClick={() => setPageTab("projects")}
             className={`px-5 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${pageTab === "projects" ? "border-primary text-primary" : "border-transparent text-neutral-500 hover:text-neutral-800"}`}
@@ -230,7 +231,7 @@ export default function AdminProjectsPage() {
                 <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Find a project..." className="w-full pl-10 pr-4 py-2 bg-white border border-neutral-200 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-primary shadow-sm" />
               </div>
-              <div className="flex gap-6 text-sm font-bold border-b border-neutral-200 w-full md:w-auto">
+              <div className="flex gap-6 text-sm font-bold border-b border-neutral-200 w-full md:w-auto overflow-x-auto whitespace-nowrap">
                 {tabs.map((tab) => (
                   <button key={tab} className={cn("pb-3 px-1 relative whitespace-nowrap", activeTab === tab ? "text-primary" : "text-neutral-500")} onClick={() => { setActiveTab(tab); setPage(1); }}>
                     {tab}
@@ -298,7 +299,9 @@ export default function AdminProjectsPage() {
           </div>
           <div className="flex gap-3 pt-2">
             <Button variant="outline" className="flex-1" onClick={() => setModalOpen(false)}>Cancel</Button>
-            <Button className="flex-1" onClick={handleSave} disabled={saving}>{saving ? "Saving…" : "Save"}</Button>
+            <Button className="flex-1" onClick={handleSave} disabled={saving}>
+              {saving ? <span className="flex items-center gap-2"><Icon icon="mdi:loading" className="w-4 h-4 animate-spin" />{editing ? "Updating…" : "Creating…"}</span> : (editing ? "Update" : "Create")}
+            </Button>
           </div>
         </div>
       </Modal>
@@ -312,7 +315,7 @@ export default function AdminProjectsPage() {
           <>
             <Button variant="outline" onClick={() => setDeleteSlug(null)} disabled={deleting}>Cancel</Button>
             <Button variant="destructive" onClick={confirmDelete} disabled={deleting}>
-              {deleting ? "Deleting..." : "Delete"}
+              {deleting ? <span className="flex items-center gap-2"><Icon icon="mdi:loading" className="w-4 h-4 animate-spin" />Deleting…</span> : "Delete"}
             </Button>
           </>
         }

@@ -1,6 +1,5 @@
 import api from "@/lib/axios";
 import type { Career } from "@/types";
-import { dummyCareers } from "@/lib/data";
 
 export interface CareersQuery {
   page?: number;
@@ -11,32 +10,8 @@ export interface CareersQuery {
 }
 
 export async function getCareers(params?: CareersQuery) {
-  try {
-    const { data } = await api.get("/careers", { params });
-    const apiItems = data?.data?.data;
-    if (Array.isArray(apiItems) && apiItems.length > 0) {
-      return data;
-    }
-    // use local seeds when API has no records yet
-    let items = dummyCareers;
-    if (params?.status) items = items.filter((c) => c.status === params.status);
-    if (params?.department) items = items.filter((c) => c.department === params.department);
-    if (params?.search) {
-      const q = params.search.toLowerCase();
-      items = items.filter((c) => c.title.toLowerCase().includes(q) || c.department.toLowerCase().includes(q));
-    }
-    return { data: { data: items, total: items.length } };
-  } catch {
-    // fallback to local seed data when backend is unreachable
-    let items = dummyCareers;
-    if (params?.status) items = items.filter((c) => c.status === params.status);
-    if (params?.department) items = items.filter((c) => c.department === params.department);
-    if (params?.search) {
-      const q = params.search.toLowerCase();
-      items = items.filter((c) => c.title.toLowerCase().includes(q) || c.department.toLowerCase().includes(q));
-    }
-    return { data: { data: items, total: items.length } };
-  }
+  const { data } = await api.get("/careers", { params });
+  return data;
 }
 
 export async function getAdminCareers(params?: CareersQuery) {

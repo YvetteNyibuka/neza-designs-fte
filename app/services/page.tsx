@@ -32,17 +32,17 @@ export default function ServicesPage() {
   return (
     <div className="flex flex-col flex-1 w-full bg-neutral-50 pb-0">
       {/* Hero */}
-      <section className="relative w-full h-screen flex items-center justify-center">
+      <section className="relative w-full min-h-[60vh] flex items-center justify-center overflow-hidden pt-24 pb-16">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1481253127861-534498168948?q=80&w=1973&auto=format&fit=crop"
+            src="/images/servicesHero.jpeg"
             alt="Services background"
             fill
             sizes="100vw"
             style={{ objectFit: "cover" }}
             priority
           />
-          <div className="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-neutral-900/40" />
         </div>
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <h1 className="font-heading text-4xl md:text-6xl font-bold text-white mb-6">

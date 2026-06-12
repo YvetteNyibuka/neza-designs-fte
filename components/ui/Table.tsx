@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronUp, Search } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { Input } from "./Input";
 
 export interface ColumnDef<T> {
@@ -111,14 +112,22 @@ export function Table<T extends Record<string, any>>({
             <tbody className="divide-y divide-neutral-100">
               {loading ? (
                 <tr>
-                  <td colSpan={columns.length} className="px-6 py-12 text-center text-neutral-500">
-                    Loading...
+                  <td colSpan={columns.length} className="px-6 py-16 text-center">
+                    <div className="flex flex-col items-center gap-3 text-neutral-400">
+                      <Icon icon="mdi:loading" className="w-8 h-8 animate-spin text-primary/50" />
+                      <span className="text-sm">Loading...</span>
+                    </div>
                   </td>
                 </tr>
               ) : data.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} className="px-6 py-12 text-center text-neutral-500">
-                    {emptyMessage}
+                  <td colSpan={columns.length} className="px-6 py-16 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center">
+                        <Icon icon="mdi:inbox-outline" className="w-6 h-6 text-neutral-400" />
+                      </div>
+                      <p className="text-sm font-medium text-neutral-600">{emptyMessage}</p>
+                    </div>
                   </td>
                 </tr>
               ) : (

@@ -10,6 +10,7 @@ import { cn, formatDate } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { NewsletterBanner } from "@/components/layout/NewsletterBanner";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { BlogPost } from "@/types";
 
 export default function BlogPage() {
@@ -43,16 +44,16 @@ export default function BlogPage() {
   return (
     <div className="flex flex-col flex-1 w-full bg-neutral-50 pb-24">
       {/* Hero Banner */}
-      <section className="relative w-full h-screen flex items-center justify-center">
+      <section className="relative w-full min-h-[60vh] flex items-center justify-center overflow-hidden pt-24 pb-16">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1955&auto=format&fit=crop"
+            src="/images/blogsHero.avif"
             alt="Insights background"
             fill
             style={{ objectFit: "cover" }}
             priority
           />
-          <div className="absolute inset-0 bg-neutral-900/60 backdrop-blur-[2px]" />
+          <div className="absolute inset-0 bg-neutral-900/65" />
         </div>
         <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
           <h1 className="font-heading text-4xl md:text-6xl font-bold text-white mb-6">
@@ -126,6 +127,16 @@ export default function BlogPage() {
 
         {/* Grid Posts */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
+          {!loading && gridPosts.length === 0 && (
+            <div className="col-span-full">
+              <EmptyState
+                icon="mdi:newspaper-variant-outline"
+                title="No articles yet"
+                description="We haven't published any articles in this category yet. Check back soon or explore another topic."
+                action={{ label: "View All Posts", onClick: () => setActiveCat("All") }}
+              />
+            </div>
+          )}
           {gridPosts.map((post) => (
             <div key={post._id} className="bg-white rounded-2xl border border-neutral-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow group flex flex-col h-full">
               <div className="relative h-56 w-full overflow-hidden">

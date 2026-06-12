@@ -59,7 +59,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden xl:flex items-center gap-8">
           {navLinks.map((link) => (
             <Link
               key={link.name}
@@ -82,7 +82,7 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="hidden md:block">
+        <div className="hidden xl:block">
           <Link href="/contact">
             <Button
               variant={isSolid ? "default" : "outline"}
@@ -98,7 +98,7 @@ export function Navbar() {
 
         {/* Mobile menu button */}
         <button
-          className="md:hidden p-2"
+          className="xl:hidden p-2"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? (
@@ -111,7 +111,7 @@ export function Navbar() {
 
       {/* Mobile Nav */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t border-neutral-100 py-4 px-4 flex flex-col gap-4">
+        <div className="xl:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t border-neutral-100 py-4 px-4 flex flex-col gap-4">
           {navLinks.map((link) => (
             <Link
               key={link.name}
