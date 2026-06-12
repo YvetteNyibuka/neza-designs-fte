@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -108,7 +109,7 @@ export default function AdminLoginPage() {
       {/* Left — brand panel */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-neutral-900 flex-col items-center justify-center overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
+          src="/images/projectHero.jpeg"
           alt="NEEZA"
           fill
           style={{ objectFit: "cover" }}
@@ -128,8 +129,10 @@ export default function AdminLoginPage() {
         <div className="w-full max-w-sm">
           {/* Logo */}
           <div className="mb-10">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center mb-6">
-              <Icon icon="mdi:office-building" className="w-6 h-6 text-white" />
+            <div className="mb-6">
+              <Link href="/">
+                <Image src="/logos/BprimaryLogo.png" alt="NEEZA" width={120} height={48} className="object-contain" />
+              </Link>
             </div>
             <h2 className="font-heading text-3xl font-bold text-neutral-900 mb-1">
               {step === "login" ? "Admin Login" : "Verify OTP"}

@@ -51,11 +51,12 @@ export default function ContactPage() {
 
   return (
     <div className="flex flex-col flex-1 w-full bg-neutral-50">
-      <section className="relative pt-40 pb-24 bg-[#231F1C]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(183,94,26,0.35),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(218,161,25,0.2),transparent_35%)]" />
+      <section className="relative pt-40 pb-24 bg-neutral-900">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(183,94,26,0.15),transparent_70%)]" />
         <div className="relative container mx-auto px-4 md:px-8 max-w-7xl text-center">
+          <p className="text-accent text-xs font-bold tracking-widest uppercase mb-4">Get In Touch</p>
           <h1 className="font-heading text-4xl md:text-6xl font-bold text-white mb-6">Start Your Project Inquiry</h1>
-          <p className="text-white/80 text-lg max-w-2xl mx-auto">
+          <p className="text-white/70 text-lg max-w-2xl mx-auto leading-relaxed">
             Share your vision and our team will get back to you with a tailored roadmap for architecture, engineering, or project delivery.
           </p>
         </div>
@@ -72,7 +73,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p className="text-xs font-bold tracking-widest uppercase text-neutral-400">Phone</p>
-                  <p className="text-sm text-neutral-700 mt-1">+250 788 548 567</p>
+                  <p className="text-sm text-neutral-700 mt-1">+250 788 302 658</p>
                 </div>
               </div>
 

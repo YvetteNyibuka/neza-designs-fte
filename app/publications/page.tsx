@@ -6,6 +6,7 @@ import { Icon } from "@iconify/react";
 import { Button } from "@/components/ui/Button";
 import { getPublications } from "@/lib/api/publications";
 import type { Publication, PublicationType } from "@/types";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
 
@@ -55,17 +56,17 @@ export default function PublicationsPage() {
   return (
     <div className="flex flex-col flex-1 w-full bg-neutral-50">
       {/* Hero */}
-      <section className="relative w-full h-screen flex items-center justify-center">
+      <section className="relative w-full min-h-[60vh] flex items-center justify-center overflow-hidden pt-24 pb-16">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2071&auto=format&fit=crop"
+            src="/images/publicationsHero.jpeg"
             alt="Publications background"
             fill
             sizes="100vw"
             style={{ objectFit: "cover" }}
             priority
           />
-          <div className="absolute inset-0 bg-neutral-900/65 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-neutral-900/65" />
         </div>
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <p className="text-accent text-xs font-bold tracking-widest uppercase mb-4">Knowledge & Resources</p>
@@ -121,73 +122,78 @@ export default function PublicationsPage() {
           )}
 
           {!loading && filtered.length === 0 && (
-            <div className="bg-white border border-neutral-200 rounded-xl p-8 text-neutral-600">
-              No publications found{search ? ` for "${search}"` : ""}.
-            </div>
+            <EmptyState
+              icon="mdi:file-document-multiple-outline"
+              title="No publications found"
+              description={search ? `No results for "${search}". Try a different search term or browse all types.` : "There are no publications in this category yet. Check back soon."}
+              action={search || activeType !== "All" ? { label: "Clear Filters", onClick: () => { setSearch(""); setActiveType("All"); } } : undefined}
+            />
           )}
 
-          {/* Document table */}
+          {/* Document list */}
           {!loading && filtered.length > 0 && (
-            <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden">
-              {/* Table header */}
-              <div className="grid grid-cols-[1fr_80px_140px] px-5 py-3 bg-neutral-50 border-b border-neutral-200 text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
-                <span>Title</span>
-                <span>Info</span>
-                <span className="text-right pr-1">Modified</span>
-              </div>
-
-              {filtered.map((pub, i) => {
+            <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden divide-y divide-neutral-100">
+              {filtered.map((pub) => {
                 const { icon, color } = getFileIcon(pub.fileUrl);
                 const url = pub.fileUrl ?? pub.externalUrl;
                 return (
                   <div
                     key={pub._id}
                     className={cn(
-                      "grid grid-cols-[1fr_80px_140px] px-5 py-4 items-center gap-x-2 transition-colors",
-                      i !== filtered.length - 1 && "border-b border-neutral-100",
+                      "flex items-start gap-4 px-5 py-5 transition-colors",
                       url ? "hover:bg-neutral-50 cursor-pointer group" : ""
                     )}
                     onClick={() => url && window.open(url, "_blank", "noopener,noreferrer")}
                   >
-                    {/* Icon + Title */}
-                    <div className="flex items-start gap-3 min-w-0">
-                      <Icon icon={icon} className={cn("w-9 h-9 shrink-0 mt-0.5", color)} />
-                      <div className="min-w-0">
-                        <p className={cn("font-medium text-sm text-neutral-900 leading-snug line-clamp-2", url && "group-hover:text-primary transition-colors")}>
-                          {pub.title}
-                        </p>
-                        {(pub.tags ?? []).length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {(pub.tags ?? []).slice(0, 3).map((tag) => (
-                              <span key={tag} className="text-[10px] bg-neutral-100 text-neutral-500 px-1.5 py-0.5 rounded-full">
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
+                    {/* Cover image or file icon */}
+                    {pub.coverImage ? (
+                      <div className="relative w-14 h-14 rounded-lg overflow-hidden shrink-0 bg-neutral-100 border border-neutral-200">
+                        <Image src={pub.coverImage} alt={pub.title} fill style={{ objectFit: "cover" }} unoptimized />
+                      </div>
+                    ) : (
+                      <div className="w-14 h-14 rounded-lg bg-neutral-50 border border-neutral-200 flex items-center justify-center shrink-0">
+                        <Icon icon={icon} className={cn("w-8 h-8", color)} />
+                      </div>
+                    )}
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className={cn("font-semibold text-sm text-neutral-900 leading-snug", url && "group-hover:text-primary transition-colors")}>
+                            {pub.title}
+                          </p>
+                          <p className="text-xs text-neutral-500 mt-1 line-clamp-2 leading-relaxed">{pub.summary}</p>
+                          {(pub.tags ?? []).length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {(pub.tags ?? []).slice(0, 4).map((tag) => (
+                                <span key={tag} className="text-[10px] bg-neutral-100 text-neutral-500 px-1.5 py-0.5 rounded-full">
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        {url && (
+                          <Link
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-neutral-300 hover:text-primary transition-colors shrink-0 mt-0.5"
+                            title={pub.fileUrl ? "Download" : "Open link"}
+                          >
+                            <Icon icon={pub.fileUrl ? "mdi:download" : "mdi:open-in-new"} className="w-5 h-5" />
+                          </Link>
                         )}
                       </div>
-                    </div>
-
-                    {/* File size */}
-                    <span className="text-sm text-neutral-500 whitespace-nowrap">
-                      {pub.fileSize ?? (url ? "—" : <span className="italic text-neutral-400 text-xs">No file</span>)}
-                    </span>
-
-                    {/* Date + download icon */}
-                    <div className="flex items-center justify-end gap-2 pr-1">
-                      <span className="text-sm text-neutral-400 whitespace-nowrap">{formatDate(pub.publishedAt)}</span>
-                      {url && (
-                        <Link
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="text-neutral-300 hover:text-primary transition-colors shrink-0"
-                          title={pub.fileUrl ? "Download" : "Open link"}
-                        >
-                          <Icon icon={pub.fileUrl ? "mdi:download" : "mdi:open-in-new"} className="w-4 h-4" />
-                        </Link>
-                      )}
+                      <div className="flex items-center gap-3 mt-2">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
+                          <Icon icon={icon} className={cn("w-3.5 h-3.5", color)} />
+                          {pub.type}
+                        </span>
+                        <span className="text-[10px] text-neutral-400">{formatDate(pub.publishedAt)}</span>
+                      </div>
                     </div>
                   </div>
                 );

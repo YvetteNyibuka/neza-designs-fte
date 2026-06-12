@@ -4,7 +4,6 @@ const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api/v1",
   timeout: 45000,
   withCredentials: true, // send httpOnly refresh-token cookie automatically
-  headers: { "Content-Type": "application/json" },
 });
 
 // ── attach access token ──────────────────────────────────────────

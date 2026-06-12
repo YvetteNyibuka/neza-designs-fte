@@ -14,6 +14,8 @@ import type { Career } from "@/types";
 import { getAllApplications, updateApplicationStatus } from "@/lib/api/applications";
 import type { JobApplication, ApplicationStatus } from "@/types";
 import { Plus, Trash2 } from "lucide-react";
+import { Icon } from "@iconify/react";
+import { AdminEmptyState } from "@/components/ui/AdminEmptyState";
 
 type CareerForm = {
   title: string;
@@ -57,6 +59,8 @@ export default function AdminCareersPage() {
   const [requirementInput, setRequirementInput] = useState("");
   const [responsibilityInput, setResponsibilityInput] = useState("");
   const [departmentOptions, setDepartmentOptions] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [deletingSlug, setDeletingSlug] = useState<string | null>(null);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -160,6 +164,7 @@ export default function AdminCareersPage() {
       status: form.status,
     };
 
+    setSaving(true);
     try {
       if (editing) {
         await updateCareer(editing.slug, payload);
@@ -174,16 +179,21 @@ export default function AdminCareersPage() {
     } catch (err: unknown) {
       setFieldErrors(parseApiFieldErrors(err));
       toastApiErrors(err, "Failed to save career");
+    } finally {
+      setSaving(false);
     }
   }
 
   async function onDelete(item: Career) {
+    setDeletingSlug(item.slug);
     try {
       await deleteCareer(item.slug);
       toast.success("Career deleted");
       fetchItems();
     } catch {
       toast.error("Failed to delete career");
+    } finally {
+      setDeletingSlug(null);
     }
   }
 
@@ -193,6 +203,14 @@ export default function AdminCareersPage() {
     setAllApplications(res?.data?.data ?? res?.data ?? []);
     setAppsLoading(false);
   }, []);
+
+  useEffect(() => { void fetchAllApplications(); }, [fetchAllApplications]);
+
+  // Re-fetch application counts whenever job list reloads
+  useEffect(() => {
+    if (items.length > 0) void fetchAllApplications();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items]);
 
   async function loadApplications(career: Career) {
     setSelectedCareerForApps(career);
@@ -245,7 +263,7 @@ export default function AdminCareersPage() {
       />
       <div className="p-8 max-w-350">
         {/* Tabs */}
-        <div className="flex gap-1 mb-8 border-b border-neutral-200">
+        <div className="flex gap-1 mb-8 border-b border-neutral-200 overflow-x-auto whitespace-nowrap">
           <button
             onClick={() => setActiveTab("postings")}
             className={`px-5 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === "postings" ? "border-primary text-primary" : "border-transparent text-neutral-500 hover:text-neutral-800"}`}
@@ -274,7 +292,16 @@ export default function AdminCareersPage() {
         {/* Postings Tab */}
         {activeTab === "postings" && (
           <>
-            {loading ? <p className="text-neutral-500">Loading...</p> : null}
+            {loading ? (
+              <AdminEmptyState icon="mdi:loading" title="Loading job postings…" />
+            ) : items.length === 0 ? (
+              <AdminEmptyState
+                icon="mdi:briefcase-outline"
+                title="No job postings yet"
+                description="Create your first job posting to start receiving applications."
+                action={{ label: "Create Job Posting", onClick: openCreate }}
+              />
+            ) : null}
             <div className="grid gap-4">
               {items.map((item) => (
                 <div key={item._id} className="bg-white border border-neutral-200 rounded-xl p-5 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
@@ -283,15 +310,24 @@ export default function AdminCareersPage() {
                     <p className="text-sm text-neutral-500">{item.department} · {item.location}</p>
                     <p className="text-sm text-neutral-600 mt-2">{item.employmentType} · {item.experienceLevel} · {item.status}</p>
                     {item.deadline ? (
-                      <p className="text-sm mt-2 text-neutral-500">
-                        Apply by {new Date(item.deadline).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                      <p className="text-sm mt-2 text-red-500">
+                        Deadline: {new Date(item.deadline).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                       </p>
                     ) : null}
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => loadApplications(item)}>Applications</Button>
+                    <Button variant="outline" size="sm" onClick={() => loadApplications(item)}>
+                      {appsLoading ? (
+                        <span className="flex items-center gap-1.5"><Icon icon="mdi:loading" className="w-3.5 h-3.5 animate-spin" />Loading…</span>
+                      ) : (() => {
+                        const count = allApplications.filter((a) => a.careerId === item._id || a.careerSlug === item.slug).length;
+                        return count > 0 ? `${count} Application${count !== 1 ? "s" : ""}` : "Applications";
+                      })()}
+                    </Button>
                     <Button variant="outline" size="sm" onClick={() => openEdit(item)}>Edit</Button>
-                    <Button variant="destructive" size="sm" onClick={() => onDelete(item)}>Delete</Button>
+                    <Button variant="destructive" size="sm" onClick={() => onDelete(item)} disabled={deletingSlug === item.slug}>
+                      {deletingSlug === item.slug ? <span className="flex items-center gap-1.5"><Icon icon="mdi:loading" className="w-3.5 h-3.5 animate-spin" />Deleting…</span> : "Delete"}
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -339,11 +375,13 @@ export default function AdminCareersPage() {
             </div>
 
             {appsLoading ? (
-              <p className="text-neutral-500 text-sm">Loading...</p>
+              <AdminEmptyState icon="mdi:loading" title="Loading applications…" />
             ) : displayedApplications.length === 0 ? (
-              <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-8 text-neutral-500 text-sm">
-                No applications found{filterJobSlug !== "all" || filterStatus !== "all" ? " for the selected filters" : ""}.
-              </div>
+              <AdminEmptyState
+                icon="mdi:account-multiple-outline"
+                title="No applications found"
+                description={filterJobSlug !== "all" || filterStatus !== "all" ? "No applications match the selected filters. Try adjusting them." : "No one has applied yet. Share the job postings to start receiving applications."}
+              />
             ) : (
               <div className="grid gap-4">
                 {displayedApplications.map((app) => (
@@ -536,7 +574,9 @@ export default function AdminCareersPage() {
 
           <div className="flex gap-3 pt-2">
             <Button variant="outline" className="flex-1" onClick={() => setModalOpen(false)}>Cancel</Button>
-            <Button className="flex-1" onClick={onSave}>Save</Button>
+            <Button className="flex-1" onClick={onSave} disabled={saving}>
+              {saving ? <span className="flex items-center gap-2"><Icon icon="mdi:loading" className="w-4 h-4 animate-spin" />{editing ? "Updating…" : "Creating…"}</span> : (editing ? "Update" : "Create")}
+            </Button>
           </div>
         </div>
       </Modal>

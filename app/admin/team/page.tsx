@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Search, Plus, MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { Icon } from "@iconify/react";
+import { AdminEmptyState } from "@/components/ui/AdminEmptyState";
 import Image from "next/image";
 import { getTeam, createTeamMember, updateTeamMember, deleteTeamMember } from "@/lib/api/team";
 import { ImageUpload } from "@/components/ui/ImageUpload";
@@ -119,7 +121,14 @@ export default function AdminTeamPage() {
         </div>
 
         {loading ? (
-          <div className="text-center text-neutral-400 py-16 text-sm">Loading…</div>
+          <AdminEmptyState icon="mdi:loading" title="Loading team members…" />
+        ) : filtered.length === 0 ? (
+          <AdminEmptyState
+            icon="mdi:account-group-outline"
+            title={search ? `No team members matching "${search}"` : "No team members yet"}
+            description={search ? "Try a different search term." : "Add your first team member to showcase your team on the website."}
+            action={!search ? { label: "Add Team Member", onClick: openCreate } : undefined}
+          />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filtered.map((user) => (
@@ -171,7 +180,9 @@ export default function AdminTeamPage() {
           </div>
           <div className="flex gap-3 pt-2">
             <Button variant="outline" className="flex-1" onClick={() => setModalOpen(false)}>Cancel</Button>
-            <Button className="flex-1" onClick={handleSave} disabled={saving}>{saving ? "Saving…" : "Save"}</Button>
+            <Button className="flex-1" onClick={handleSave} disabled={saving}>
+              {saving ? <span className="flex items-center gap-2"><Icon icon="mdi:loading" className="w-4 h-4 animate-spin" />{editing ? "Updating…" : "Creating…"}</span> : (editing ? "Update" : "Create")}
+            </Button>
           </div>
         </div>
       </Modal>
@@ -185,7 +196,7 @@ export default function AdminTeamPage() {
           <>
             <Button variant="outline" onClick={() => setDeleteId(null)} disabled={deleting}>Cancel</Button>
             <Button variant="destructive" onClick={confirmDelete} disabled={deleting}>
-              {deleting ? "Deleting..." : "Delete"}
+              {deleting ? <span className="flex items-center gap-2"><Icon icon="mdi:loading" className="w-4 h-4 animate-spin" />Deleting…</span> : "Delete"}
             </Button>
           </>
         }

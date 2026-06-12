@@ -19,11 +19,11 @@ export default function AboutPage() {
       {/* 
         Hero Header 
       */}
-      <section className="relative w-full h-screen flex items-center justify-center">
+      <section className="relative w-full min-h-[60vh] flex items-center justify-center overflow-hidden pt-24 pb-16">
         {/* Background Image Setup */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop"
+            src="/images/careersHero.jpeg"
             alt="NEEZA Office"
             fill
             style={{ objectFit: "cover" }}
