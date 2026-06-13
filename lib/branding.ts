@@ -14,9 +14,9 @@ export const DEFAULT_BRANDING: BrandingConfig = {
   primaryColor: "#B75E1A",
   secondaryColor: "#231F1C",
   accentColor: "#DAA119",
-  logoLight: "/logos/BprimaryLogo.png",
-  logoDark: "/logos/WprimaryLogo.png",
-  favicon: "/logos/BprimaryLogo.png",
+  logoLight: "/logos/BprimaryLogo_v2.png",
+  logoDark: "/logos/BprimaryLogo_v2.png",
+  favicon: "/logos/BprimaryLogo_v2.png",
   font: "Playfair Display",
 };
 
@@ -104,12 +104,15 @@ export function darkenHexColor(hex: string, ratio = 0.18): string {
 }
 
 export async function getServerBrandingSettings(): Promise<BrandingConfig> {
-  const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api/v1").replace(/\/$/, "");
+  const baseUrl = (
+    process.env.INTERNAL_API_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    "http://localhost:5001/api/v1"
+  ).replace(/\/$/, "");
 
   try {
     const response = await fetch(`${baseUrl}/settings`, {
-      cache: "no-store",
-      next: { revalidate: 0 },
+      next: { revalidate: 300 },
     });
 
     if (!response.ok) {

@@ -151,14 +151,14 @@ export default async function Home() {
                 label: "PROJECT MANAGEMENT",
                 icon: <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>,
                 desc: ["End-to-End Insight, Cost Control and Timely Delivery"],
-                img: "/images/about/management.avif",
+                img: "/images/about/projectMgt.jpeg",
               },
               {
                 title: "Land Acquisition",
                 label: "LAND ACQUISITION",
                 icon: <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>,
                 desc: ["Site Feasibility, Due Diligence and Procurement Strategy"],
-                img: "/images/about/land-acquisition.avif",
+                img: "/images/about/landAcq.jpeg",
               },
             ].map((service, i) => (
               <Link href="/services" key={i} className="group relative h-96 rounded-2xl overflow-hidden block">
@@ -259,7 +259,7 @@ export default async function Home() {
             ].map((name) => (
               <div key={name} className="opacity-80 hover:opacity-100 transition-opacity duration-300">
                 <Image
-                  src="/logos/BprimaryLogo.png"
+                  src="/logos/BprimaryLogo_v2.png"
                   alt={name}
                   width={120}
                   height={120}

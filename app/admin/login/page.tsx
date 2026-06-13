@@ -131,7 +131,7 @@ export default function AdminLoginPage() {
           <div className="mb-10">
             <div className="mb-6">
               <Link href="/">
-                <Image src="/logos/BprimaryLogo.png" alt="NEEZA" width={120} height={48} className="object-contain" />
+                <Image src="/logos/BprimaryLogo_v2.png" alt="NEEZA" width={120} height={48} className="object-contain" />
               </Link>
             </div>
             <h2 className="font-heading text-3xl font-bold text-neutral-900 mb-1">
