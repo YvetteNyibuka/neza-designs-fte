@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@iconify/react";
 import { getServices } from "@/lib/api/services";
+import { getImageUrl } from "@/lib/imageUrl";
 import type { Service } from "@/types";
 
 function serviceToProjectCategory(serviceTitle: string): string {
@@ -106,7 +107,7 @@ export default function ServicesPage() {
               <div className="flex-1 w-full">
                 <div className="relative h-100 md:h-125 w-full rounded-3xl overflow-hidden shadow-xl border border-neutral-100">
                   {svc.imageUrl && (
-                    <Image src={svc.imageUrl} alt={svc.title} fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: "cover" }} unoptimized />
+                    <Image src={getImageUrl(svc.imageUrl)} alt={svc.title} fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: "cover" }} unoptimized />
                   )}
                 </div>
               </div>

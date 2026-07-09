@@ -8,6 +8,7 @@ import { getPost, getPosts } from "@/lib/api/posts";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { getImageUrl } from "@/lib/imageUrl";
 import { formatDate } from "@/lib/utils";
 import { Icon } from "@iconify/react";
 import { ArrowLeft, ArrowRight, Clock, Calendar } from "lucide-react";
@@ -101,7 +102,7 @@ export default function BlogPostPage({
       <section className="relative w-full h-[80vh] min-h-140 flex items-end">
         <div className="absolute inset-0 z-0">
           <Image
-            src={post.imageUrl}
+            src={getImageUrl(post.imageUrl)}
             alt={post.title}
             fill
             sizes="100vw"
@@ -282,7 +283,7 @@ export default function BlogPostPage({
                         >
                           <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0">
                             <Image
-                              src={related.imageUrl}
+                              src={getImageUrl(related.imageUrl)}
                               alt={related.title}
                               fill
                               sizes="64px"

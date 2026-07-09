@@ -8,6 +8,10 @@ function isBlank(value: string | null | undefined): boolean {
 }
 
 function isValidUrl(value: string): boolean {
+  // Accept absolute URLs (http/https) or local upload paths (/uploads/...)
+  if (value.startsWith('/uploads/') || value.startsWith('http://') || value.startsWith('https://')) {
+    return true;
+  }
   try {
     new URL(value);
     return true;
@@ -30,32 +34,39 @@ export function validateProjectForm(form: {
   title: string;
   category: string;
   status: string;
-  description: string;
+  description?: string;
   imageUrl?: string;
+  location?: string;
   completionYear?: string;
+  client?: string;
 }): string[] {
   const errors: string[] = [];
 
+  // Required: title
   const title = form.title.trim();
   if (title.length < 2) errors.push("title: Must be at least 2 characters");
   if (title.length > 200) errors.push("title: Must be at most 200 characters");
 
+  // Required: category
   if (isBlank(form.category)) {
     errors.push("category: Category is required");
   }
 
+  // Required: status
   if (!PROJECT_STATUSES.includes(form.status as (typeof PROJECT_STATUSES)[number])) {
     errors.push("status: Invalid status");
   }
 
-  if (form.description.trim().length < 10) {
-    errors.push("description: Must be at least 10 characters");
+  // Required: imageUrl
+  if (isBlank(form.imageUrl)) {
+    errors.push("imageUrl: Cover image is required");
+  } else if (!isValidUrl(form.imageUrl)) {
+    errors.push("imageUrl: Must be a valid URL or local upload path");
   }
 
-  if (form.imageUrl && !isValidUrl(form.imageUrl)) {
-    errors.push("imageUrl: Must be a valid URL");
-  }
+  // Optional: description (no validation needed - can be empty or any length)
 
+  // Optional: completionYear
   if (!isBlank(form.completionYear)) {
     const year = Number(form.completionYear);
     if (!Number.isInteger(year)) {
@@ -64,6 +75,9 @@ export function validateProjectForm(form: {
       errors.push("completionYear: Must be between 1900 and 2100");
     }
   }
+
+  // Optional: location (no validation needed)
+  // Optional: client (no validation needed)
 
   return errors;
 }
@@ -85,7 +99,7 @@ export function validateServiceForm(form: {
   if (shortDescription.length > 300) errors.push("shortDescription: Must be at most 300 characters");
 
   if (form.imageUrl && !isValidUrl(form.imageUrl)) {
-    errors.push("imageUrl: Must be a valid URL");
+    errors.push("imageUrl: Must be a valid URL or local upload path");
   }
 
   if (!Array.isArray(form.features) || form.features.length < 1) {
@@ -143,7 +157,7 @@ export function validateBlogForm(form: {
   }
 
   if (form.imageUrl && !isValidUrl(form.imageUrl)) {
-    errors.push("imageUrl: Must be a valid URL");
+    errors.push("imageUrl: Must be a valid URL or local upload path");
   }
 
   if (form.authorName.trim().length < 2) errors.push("author.name: Must be at least 2 characters");
@@ -170,7 +184,7 @@ export function validateTeamForm(form: {
   if (form.bio.trim().length > 1000) errors.push("bio: Must be at most 1000 characters");
 
   if (form.imageUrl && !isValidUrl(form.imageUrl)) {
-    errors.push("imageUrl: Must be a valid URL");
+    errors.push("imageUrl: Must be a valid URL or local upload path");
   }
 
   return errors;
@@ -221,11 +235,11 @@ export function validateSeoSettingsForm(form: {
   if (description.length > 500) errors.push("metaDescription: Must be at most 500 characters");
 
   if (form.canonicalUrl && !isValidUrl(form.canonicalUrl)) {
-    errors.push("canonicalUrl: Must be a valid URL");
+    errors.push("canonicalUrl: Must be a valid absolute URL");
   }
 
   if (form.ogImage && !isValidUrl(form.ogImage)) {
-    errors.push("ogImage: Must be a valid URL");
+    errors.push("ogImage: Must be a valid URL or local upload path");
   }
 
   return errors;
@@ -245,9 +259,9 @@ export function validateBrandingSettingsForm(form: {
   if (!HEX_COLOR_REGEX.test(form.secondaryColor)) errors.push("secondaryColor: Must be a valid hex color (#RRGGBB)");
   if (!HEX_COLOR_REGEX.test(form.accentColor)) errors.push("accentColor: Must be a valid hex color (#RRGGBB)");
 
-  if (form.logoLight && !isValidUrl(form.logoLight)) errors.push("logoLight: Must be a valid URL");
-  if (form.logoDark && !isValidUrl(form.logoDark)) errors.push("logoDark: Must be a valid URL");
-  if (form.favicon && !isValidUrl(form.favicon)) errors.push("favicon: Must be a valid URL");
+  if (form.logoLight && !isValidUrl(form.logoLight)) errors.push("logoLight: Must be a valid URL or local upload path");
+  if (form.logoDark && !isValidUrl(form.logoDark)) errors.push("logoDark: Must be a valid URL or local upload path");
+  if (form.favicon && !isValidUrl(form.favicon)) errors.push("favicon: Must be a valid URL or local upload path");
 
   return errors;
 }
