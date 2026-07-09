@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { getProjects } from "@/lib/api/projects";
 import { MoveRight, ShieldCheck, Zap, Leaf } from "lucide-react";
+import { getImageUrl } from "@/lib/imageUrl";
 import type { Project } from "@/types";
 
 export default async function Home() {
@@ -213,7 +214,7 @@ export default async function Home() {
           <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
             {featuredProjects.map((project) => (
               <div key={project._id} className="group relative rounded-2xl overflow-hidden h-80 min-w-[320px] md:min-w-112.5 shrink-0 snap-start">
-                <Image src={project.imageUrl} alt={project.title} fill style={{ objectFit: "cover" }} className="group-hover:scale-105 transition-transform duration-100" />
+                <Image src={getImageUrl(project.imageUrl)} alt={project.title} fill style={{ objectFit: "cover" }} className="group-hover:scale-105 transition-transform duration-100" />
                 <div className="absolute inset-0 bg-linear-to-t from-neutral-900/90 via-neutral-900/20 to-transparent" />
                 <div className="absolute bottom-8 left-8 right-8">
                   <div className="text-accent text-xs font-bold tracking-widest uppercase mb-2">

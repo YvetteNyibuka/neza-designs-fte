@@ -38,8 +38,9 @@ export function FileUpload({
     try {
       const result = await uploadFile(file, folder);
       onChange(result.url);
-    } catch {
-      setUploadError("Upload failed. Please try again.");
+    } catch (err: any) {
+      const errorMessage = err?.response?.data?.message || "Upload failed. Please try again.";
+      setUploadError(errorMessage);
       setFileName("");
     } finally {
       setUploading(false);

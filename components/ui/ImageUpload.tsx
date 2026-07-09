@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { UploadCloud, X, ImageIcon } from "lucide-react";
 import { uploadImage } from "@/lib/api/upload";
+import { getImageUrl } from "@/lib/imageUrl";
 
 interface ImageUploadProps {
   label: string;
@@ -25,8 +26,9 @@ export function ImageUpload({ label, value, folder = "general", onChange }: Imag
     try {
       const result = await uploadImage(file, folder);
       onChange(result.url);
-    } catch {
-      setError("Upload failed. Please try again.");
+    } catch (err: any) {
+      const errorMessage = err?.response?.data?.message || "Upload failed. Please try again.";
+      setError(errorMessage);
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
@@ -39,7 +41,7 @@ export function ImageUpload({ label, value, folder = "general", onChange }: Imag
       <div className="border border-neutral-200 rounded-lg overflow-hidden">
         {value ? (
           <div className="relative w-full h-44 bg-neutral-100">
-            <Image src={value} alt="preview" fill style={{ objectFit: "cover" }} unoptimized />
+            <Image src={getImageUrl(value)} alt="preview" fill style={{ objectFit: "cover" }} unoptimized />
             <button
               type="button"
               onClick={() => onChange("")}
@@ -68,7 +70,7 @@ export function ImageUpload({ label, value, folder = "general", onChange }: Imag
             {uploading ? "Uploading…" : value ? "Replace Image" : "Choose Image"}
           </button>
           {uploading && (
-            <span className="text-xs text-primary animate-pulse">Uploading to Cloudinary…</span>
+            <span className="text-xs text-primary animate-pulse">Uploading…</span>
           )}
         </div>
       </div>

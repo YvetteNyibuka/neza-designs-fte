@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import type { Project } from "@/types";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { getImageUrl } from "@/lib/imageUrl";
 
 const statusFilters = [
   { label: "All Statuses" },
@@ -18,13 +19,18 @@ const statusFilters = [
   { label: "Consulted" },
 ];
 
+interface ProjectWithAspectRatio extends Project {
+  aspectRatio?: number;
+}
+
 function ProjectsPageContent() {
   const searchParams = useSearchParams();
   const [activeCategory, setActiveCategory] = useState("All Categories");
   const [activeStatus, setActiveStatus] = useState("All Statuses");
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<ProjectWithAspectRatio[]>([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<string[]>([]);
+  const [imageAspectRatios, setImageAspectRatios] = useState<Record<string, number>>({});
 
   useEffect(() => {
     getCategories("projects")
@@ -33,6 +39,37 @@ function ProjectsPageContent() {
   }, []);
 
   const categoryFilters = ["All Categories", ...Array.from(new Set([...categories, ...projects.map((project) => project.category).filter(Boolean), activeCategory !== "All Categories" ? activeCategory : ""]))].filter(Boolean);
+
+  // Common project image dimensions and their aspect ratios
+  const getAspectRatio = (url: string): number => {
+    // Standard aspect ratios for common project image dimensions
+    const ratios: Record<string, number> = {
+      "3840x2150": 3840 / 2150, // ~1.78
+      "7680x4320": 7680 / 4320, // ~1.78
+      "4000x2250": 4000 / 2250, // ~1.78
+      "1920x1080": 1920 / 1080, // ~1.78
+      "2560x1440": 2560 / 1440, // ~1.78
+    };
+
+    // Try to detect from URL if it contains dimensions
+    for (const [dims, ratio] of Object.entries(ratios)) {
+      if (url.includes(dims)) return ratio;
+    }
+
+    // Default to 16:9 aspect ratio (1.78)
+    return 16 / 9;
+  };
+
+  const handleImageLoad = (projectId: string, event: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = event.currentTarget;
+    if (img.naturalWidth && img.naturalHeight) {
+      const ratio = img.naturalWidth / img.naturalHeight;
+      setImageAspectRatios((prev) => ({
+        ...prev,
+        [projectId]: ratio,
+      }));
+    }
+  };
 
   // Read searchParams on client only to avoid hydration mismatch
   useEffect(() => {
@@ -118,27 +155,38 @@ function ProjectsPageContent() {
             action={{ label: "Clear Filters", onClick: () => { setActiveCategory("All Categories"); setActiveStatus("All Statuses"); } }}
           />
         ) : (
-          <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-            {projects.map((project, idx) => (
-              <div key={project._id} className="break-inside-avoid relative rounded-2xl overflow-hidden group cursor-pointer">
-                <div className={cn("relative w-full", idx % 3 === 0 ? "h-125" : idx % 2 === 0 ? "h-87.5" : "h-112.5")}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-max">
+            {projects.map((project) => {
+              const aspectRatio = imageAspectRatios[project._id] || getAspectRatio(project.imageUrl);
+              const containerHeight = Math.max(300, Math.min(500, (100 / aspectRatio) * 40));
+
+              return (
+                <div
+                  key={project._id}
+                  className="relative rounded-2xl overflow-hidden group cursor-pointer"
+                  style={{ aspectRatio: `${aspectRatio}` }}
+                >
                   <Image
-                    src={project.imageUrl}
+                    src={getImageUrl(project.imageUrl)}
                     alt={project.title}
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     style={{ objectFit: "cover" }}
                     className="group-hover:scale-105 transition-transform duration-700"
+                    onLoad={(e) => handleImageLoad(project._id, e)}
                     unoptimized
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
                   <div className="absolute bottom-6 left-6 right-6">
-                    <Badge variant="secondary" className="text-[10px] text-primary tracking-widest uppercase mb-3 bg-white/90">{project.category}</Badge>
+                    <Badge variant="secondary" className="text-[10px] text-primary tracking-widest uppercase mb-3 bg-white/90">
+                      {project.category}
+                    </Badge>
                     <h3 className="font-heading font-bold text-xl text-white">{project.title}</h3>
                     {project.location && <p className="text-white/70 text-sm mt-1">{project.location}</p>}
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
