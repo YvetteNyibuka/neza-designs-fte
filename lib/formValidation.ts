@@ -58,9 +58,10 @@ export function validateProjectForm(form: {
   }
 
   // Required: imageUrl
-  if (isBlank(form.imageUrl)) {
+  const imageUrl = form.imageUrl ?? "";
+  if (isBlank(imageUrl)) {
     errors.push("imageUrl: Cover image is required");
-  } else if (!isValidUrl(form.imageUrl)) {
+  } else if (!isValidUrl(imageUrl)) {
     errors.push("imageUrl: Must be a valid URL or local upload path");
   }
 
