@@ -1,7 +1,15 @@
 import axios from "axios";
 
+// Server-side (SSR/RSC) requests run on the same host as the API, so they must
+// go through the internal address — routing them through the public domain
+// causes the server to hairpin back to itself, which times out on most hosts.
+const baseURL =
+  typeof window === "undefined"
+    ? process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api/v1"
+    : process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api/v1";
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api/v1",
+  baseURL,
   timeout: 45000,
   withCredentials: true, // send httpOnly refresh-token cookie automatically
 });

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { getTeam } from "@/lib/api/team";
+import { getImageUrl } from "@/lib/imageUrl";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Compass, Network, Leaf, Users } from "lucide-react";
 import type { TeamMember } from "@/types";
@@ -169,12 +170,13 @@ export default function AboutPage() {
             {team.map((member) => (
               <div key={member._id} className="group cursor-pointer">
                 <div className="relative h-100 w-full rounded-2xl overflow-hidden mb-6 bg-neutral-100">
-                  <Image 
-                    src={member.imageUrl} 
-                    alt={member.name} 
-                    fill 
-                    style={{ objectFit: "cover" }} 
+                  <Image
+                    src={getImageUrl(member.imageUrl)}
+                    alt={member.name}
+                    fill
+                    style={{ objectFit: "cover" }}
                     className="group-hover:scale-105 transition-transform duration-500 grayscale group-hover:grayscale-0"
+                    unoptimized
                   />
                 </div>
                 <h3 className="font-heading text-2xl font-bold text-neutral-900">{member.name}</h3>

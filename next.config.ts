@@ -53,6 +53,20 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.pexels.com",
       },
+      {
+        protocol: "https",
+        hostname: "api.neeza.rw",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "5001",
+      },
+      {
+        protocol: "https",
+        hostname: "localhost",
+        port: "5001",
+      },
     ],
   },
 };

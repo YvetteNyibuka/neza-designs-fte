@@ -238,13 +238,32 @@ export default function CareersPage() {
                               {job.location} · {job.employmentType} · {job.experienceLevel}
                             </p>
                             <p className="text-neutral-600 mt-3 leading-relaxed">{job.description}</p>
-                            {job.requirements.length > 0 && (
-                              <ul className="mt-4 space-y-1 list-disc list-inside text-sm text-neutral-600">
-                                {job.requirements.slice(0, 3).map((r, i) => (
-                                  <li key={i}>{r}</li>
-                                ))}
-                              </ul>
-                            )}
+                            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                              {job.responsibilities.length > 0 && (
+                                <div>
+                                  <h4 className="text-xs font-bold tracking-widest uppercase text-neutral-500 mb-2">
+                                    Responsibilities
+                                  </h4>
+                                  <ul className="space-y-1 list-disc list-inside text-sm text-neutral-600">
+                                    {job.responsibilities.map((r, i) => (
+                                      <li key={i}>{r}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              {job.requirements.length > 0 && (
+                                <div>
+                                  <h4 className="text-xs font-bold tracking-widest uppercase text-neutral-500 mb-2">
+                                    Requirements
+                                  </h4>
+                                  <ul className="space-y-1 list-disc list-inside text-sm text-neutral-600">
+                                    {job.requirements.map((r, i) => (
+                                      <li key={i}>{r}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
                           </div>
                           <div className="flex gap-2 shrink-0">
                             <Button onClick={() => openApply(job)} disabled={job.status !== "Open"}>

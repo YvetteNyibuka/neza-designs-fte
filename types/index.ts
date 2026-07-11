@@ -27,6 +27,7 @@ export interface Project {
   location: string;
   completionYear?: number;
   client?: string;
+  featured: boolean;
 }
 
 export type BlogPostCategory = string;

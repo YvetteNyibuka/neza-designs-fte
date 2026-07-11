@@ -14,6 +14,9 @@ interface ApiError {
   message?: string;
 }
 
+// Large media can take well past the default request timeout on slower connections.
+const UPLOAD_TIMEOUT_MS = 5 * 60 * 1000;
+
 export async function uploadImage(file: File, folder = "general"): Promise<UploadResponse> {
   try {
     const form = new FormData();
@@ -23,6 +26,7 @@ export async function uploadImage(file: File, folder = "general"): Promise<Uploa
       form,
       {
         headers: { "Content-Type": "multipart/form-data" },
+        timeout: UPLOAD_TIMEOUT_MS,
       }
     );
     return data.data;
@@ -42,6 +46,7 @@ export async function uploadFile(file: File, folder = "documents"): Promise<Uplo
       form,
       {
         headers: { "Content-Type": "multipart/form-data" },
+        timeout: UPLOAD_TIMEOUT_MS,
       }
     );
     return data.data;

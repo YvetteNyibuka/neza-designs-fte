@@ -1,6 +1,6 @@
 /**
- * Convert relative upload URLs to absolute backend URLs
- * Handles both local storage paths and external URLs
+ * Convert relative upload URLs to absolute public URLs.
+ * Handles both local storage paths and external URLs.
  */
 export function getImageUrl(url: string | null | undefined): string {
   if (!url) return '';
@@ -10,12 +10,12 @@ export function getImageUrl(url: string | null | undefined): string {
     return url;
   }
 
-  // If it's a relative local storage path, convert to absolute backend URL
+  // If it's a relative local storage path, convert it against the public API base.
   if (url.startsWith('/uploads/')) {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
-    // Remove /api/v1 from the end to get the base URL
-    const baseUrl = apiUrl.replace('/api/v1', '');
-    return `${baseUrl}${url}`;
+    // Uploads are served at /uploads on the API origin root, not under /api/v1.
+    const apiOrigin = apiUrl.replace(/\/api\/v1\/?$/, '').replace(/\/$/, '');
+    return `${apiOrigin}${url}`;
   }
 
   // Fallback: return as-is

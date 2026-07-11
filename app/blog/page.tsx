@@ -96,7 +96,7 @@ export default function BlogPage() {
         {activeCat === "All" && featuredPost && ( 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-primary/5 rounded-2xl overflow-hidden border border-neutral-100 hover:border-primary/20 transition-colors transition-duration-300 mb-16 shadow-sm">
             <div className="relative h-64 md:h-full min-h-100 w-full">
-              <Image src={getImageUrl(featuredPost.imageUrl)} alt={featuredPost.title} fill style={{ objectFit: "cover" }} />
+              <Image src={getImageUrl(featuredPost.imageUrl)} alt={featuredPost.title} fill style={{ objectFit: "cover" }} unoptimized />
             </div>
             <div className="p-8 md:p-12">
               <div className="flex items-center gap-4 mb-4">
@@ -141,7 +141,7 @@ export default function BlogPage() {
           {gridPosts.map((post) => (
             <div key={post._id} className="bg-white rounded-2xl border border-neutral-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow group flex flex-col h-full">
               <div className="relative h-56 w-full overflow-hidden">
-                <Image src={getImageUrl(post.imageUrl)} alt={post.title} fill style={{ objectFit: "cover" }} className="group-hover:scale-105 transition-transform duration-500" />
+                <Image src={getImageUrl(post.imageUrl)} alt={post.title} fill style={{ objectFit: "cover" }} className="group-hover:scale-105 transition-transform duration-500" unoptimized />
               </div>
               <div className="p-6 flex flex-col flex-1">
                 <div className="flex items-center justify-between mb-4">

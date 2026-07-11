@@ -7,9 +7,18 @@ import { getCategories } from "@/lib/api/categories";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
-import type { Project } from "@/types";
+import type { Project, ProjectStatus } from "@/types";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getImageUrl } from "@/lib/imageUrl";
+import { FallbackImage } from "@/components/ui/FallbackImage";
+import { MapPin, CalendarDays } from "lucide-react";
+
+const statusStyles: Record<ProjectStatus, string> = {
+  Completed: "bg-green-100 text-green-700",
+  Ongoing: "bg-blue-100 text-blue-700",
+  "Handed Over": "bg-purple-100 text-purple-700",
+  Consulted: "bg-amber-100 text-amber-700",
+};
 
 const statusFilters = [
   { label: "All Statuses" },
@@ -155,34 +164,59 @@ function ProjectsPageContent() {
             action={{ label: "Clear Filters", onClick: () => { setActiveCategory("All Categories"); setActiveStatus("All Statuses"); } }}
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-max">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {projects.map((project) => {
               const aspectRatio = imageAspectRatios[project._id] || getAspectRatio(project.imageUrl);
-              const containerHeight = Math.max(300, Math.min(500, (100 / aspectRatio) * 40));
 
               return (
                 <div
                   key={project._id}
-                  className="relative rounded-2xl overflow-hidden group cursor-pointer"
-                  style={{ aspectRatio: `${aspectRatio}` }}
+                  className="group bg-white rounded-2xl border border-neutral-200/80 shadow-sm overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-primary/30"
                 >
-                  <Image
-                    src={getImageUrl(project.imageUrl)}
-                    alt={project.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    style={{ objectFit: "cover" }}
-                    className="group-hover:scale-105 transition-transform duration-700"
-                    onLoad={(e) => handleImageLoad(project._id, e)}
-                    unoptimized
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
-                  <div className="absolute bottom-6 left-6 right-6">
-                    <Badge variant="secondary" className="text-[10px] text-primary tracking-widest uppercase mb-3 bg-white/90">
+                  <div className="relative w-full overflow-hidden" style={{ aspectRatio: `${aspectRatio}` }}>
+                    <FallbackImage
+                      src={getImageUrl(project.imageUrl)}
+                      alt={project.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      style={{ objectFit: "cover" }}
+                      className="group-hover:scale-105 transition-transform duration-700"
+                      onLoad={(e) => handleImageLoad(project._id, e)}
+                      unoptimized
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/0 to-transparent" />
+                    <Badge
+                      variant="secondary"
+                      className={cn(
+                        "absolute top-4 right-4 text-[10px] px-2.5 py-1 tracking-widest uppercase font-bold",
+                        statusStyles[project.status]
+                      )}
+                    >
+                      {project.status}
+                    </Badge>
+                    <Badge variant="secondary" className="absolute top-4 left-4 text-[10px] px-2.5 py-1 tracking-widest uppercase font-bold text-primary bg-white/90">
                       {project.category}
                     </Badge>
-                    <h3 className="font-heading font-bold text-xl text-white">{project.title}</h3>
-                    {project.location && <p className="text-white/70 text-sm mt-1">{project.location}</p>}
+                  </div>
+
+                  <div className="p-6">
+                    <h3 className="font-heading font-bold text-xl text-neutral-900 mb-3 line-clamp-1 group-hover:text-primary transition-colors">
+                      {project.title}
+                    </h3>
+                    <div className="flex flex-col gap-1.5 text-sm text-neutral-500">
+                      {project.location && (
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <span className="truncate">{project.location}</span>
+                        </div>
+                      )}
+                      {project.completionYear && (
+                        <div className="flex items-center gap-2">
+                          <CalendarDays className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <span>{project.completionYear}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               );

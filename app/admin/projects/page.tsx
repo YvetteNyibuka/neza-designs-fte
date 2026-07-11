@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
-import { Edit, Trash2, Plus } from "lucide-react";
+import { Edit, Trash2, Plus, Star } from "lucide-react";
 import { Icon } from "@iconify/react";
 import { cn } from "@/lib/utils";
 import { CategoryManagerPanel } from "@/components/admin/CategoryManagerPanel";
@@ -21,7 +21,7 @@ import type { Project } from "@/types";
 
 const STATUSES = ["Completed", "Ongoing", "Handed Over", "Consulted"] as const;
 
-const emptyForm = { title: "", category: "" as Project["category"], status: "Ongoing" as Project["status"], description: "", imageUrl: "", location: "", client: "", completionYear: "" };
+const emptyForm = { title: "", category: "" as Project["category"], status: "Ongoing" as Project["status"], description: "", imageUrl: "", location: "", client: "", completionYear: "", featured: false };
 
 export default function AdminProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -83,6 +83,7 @@ export default function AdminProjectsPage() {
       location: project.location ?? "",
       client: project.client ?? "",
       completionYear: project.completionYear ? String(project.completionYear) : "",
+      featured: project.featured ?? false,
     });
     setModalOpen(true);
   }
@@ -148,6 +149,9 @@ export default function AdminProjectsPage() {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg>
           </div>
           <span className="font-bold text-neutral-900">{item.title}</span>
+          {item.featured && (
+            <Star className="w-3.5 h-3.5 text-[#DAA119] fill-[#DAA119]" aria-label="Featured" />
+          )}
         </div>
       ),
     },
@@ -293,6 +297,15 @@ export default function AdminProjectsPage() {
           <Input label="Location" value={form.location} onChange={(e) => setForm((f) => ({ ...f, location: (e.target as HTMLInputElement).value }))} />
           <Input label="Client" value={form.client} onChange={(e) => setForm((f) => ({ ...f, client: (e.target as HTMLInputElement).value }))} />
           <Input label="Completion Year" type="number" value={form.completionYear} onChange={(e) => setForm((f) => ({ ...f, completionYear: (e.target as HTMLInputElement).value }))} />
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={form.featured}
+              onChange={(e) => setForm((f) => ({ ...f, featured: e.target.checked }))}
+              className="w-4 h-4 rounded border-neutral-300 text-primary focus:ring-primary/30"
+            />
+            <span className="text-sm font-medium text-neutral-700">Featured</span>
+          </label>
           <div>
             <label className="block text-sm font-medium text-neutral-700 mb-1">Description</label>
             <textarea rows={4} className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary resize-none" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
